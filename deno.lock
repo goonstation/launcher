@@ -2,7 +2,9 @@
   "version": "5",
   "specifiers": {
     "npm:@tauri-apps/api@2": "2.5.0",
+    "npm:@tauri-apps/api@^2.5.0": "2.5.0",
     "npm:@tauri-apps/cli@2": "2.5.0",
+    "npm:@tauri-apps/plugin-fs@^2.3.0": "2.3.0",
     "npm:@tauri-apps/plugin-http@^2.4.4": "2.4.4",
     "npm:@tauri-apps/plugin-opener@^2.2.7": "2.2.7",
     "npm:typescript@~5.8.3": "5.8.3",
@@ -309,6 +311,12 @@
       ],
       "bin": true
     },
+    "@tauri-apps/plugin-fs@2.3.0": {
+      "integrity": "sha512-G9gEyYVUaaxhdRJBgQTTLmzAe0vtHYxYyN1oTQzU3zwvb8T+tVLcAqCdFMWHq0qGeGbmynI5whvYpcXo5LvZ1w==",
+      "dependencies": [
+        "@tauri-apps/api"
+      ]
+    },
     "@tauri-apps/plugin-http@2.4.4": {
       "integrity": "sha512-IjlaaS4z8ybB10qnh6djZ2FIaHdWVs/U1D1C56udKcjX1f+jAmR8/s7qBV5cv/OmcGkOIzet3LWuH70LKf4J2A==",
       "dependencies": [
@@ -451,8 +459,9 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@tauri-apps/api@2",
+        "npm:@tauri-apps/api@^2.5.0",
         "npm:@tauri-apps/cli@2",
+        "npm:@tauri-apps/plugin-fs@^2.3.0",
         "npm:@tauri-apps/plugin-http@^2.4.4",
         "npm:@tauri-apps/plugin-opener@^2.2.7",
         "npm:typescript@~5.8.3",

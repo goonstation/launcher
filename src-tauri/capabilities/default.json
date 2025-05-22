@@ -3,5 +3,15 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["main"],
-  "permissions": ["core:default", "core:window:allow-close", "opener:default"]
+  "permissions": [
+    "core:default",
+    "core:window:allow-close",
+    {
+      "identifier": "http:default",
+      "allow": [{ "url": "https://api.goonhub.com" }]
+    },
+    "opener:default",
+    "fs:default",
+    "fs:allow-appcache-write"
+  ]
 }

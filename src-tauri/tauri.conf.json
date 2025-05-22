@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "goon-launcher-tauri",
+  "productName": "goonstation-launcher",
   "version": "0.1.0",
-  "identifier": "com.goon-launcher-tauri.app",
+  "identifier": "com.goonstation-launcher.app",
   "build": {
     "beforeDevCommand": "deno task dev",
     "devUrl": "http://localhost:1420",
@@ -17,7 +17,8 @@
         "width": 800,
         "height": 600,
         "resizable": true,
-        "center": true
+        "center": true,
+        "backgroundColor": "#2f2f2f"
       }
     ],
     "security": {
@@ -27,12 +28,6 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "icon": ["icons/goonstation.ico"]
   }
 }

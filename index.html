@@ -1,41 +1,41 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Goonstation Launcher</title>
-    <script type="module" src="/src/main.ts" defer></script>
-  </head>
 
-  <body>
-    <!-- Audio element for background music -->
-    <audio id="background-music" loop>
-      <source src="/src/assets/after_party.ogg" type="audio/ogg">
-      Your browser does not support the audio element.
-    </audio>
-    
-    <!-- Mute/Unmute Button -->
-    <button id="mute-button" class="mute-button">🔊</button>
-    
-    <main class="container">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/src/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goonstation Launcher</title>
+  <script type="module" src="/src/main.ts" defer></script>
+</head>
+
+<body>
+  <!-- Audio element for background music -->
+  <audio id="background-music" loop>
+    <source src="/src/assets/after_party.ogg" type="audio/ogg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <button id="mute-button" class="mute-button">🔊</button>
+
+  <main class="container">
+    <div class="row">
       <h1>Goonstation Launcher</h1>
+      <img src="/src/assets/goonstation.ico" class="logo" alt="Goonstation logo" />
+    </div>
 
-      <div class="row">
-        <img src="/src/assets/goonstation.ico" class="logo" alt="Goonstation logo" />
-      </div>      <p>Welcome to Goon Launcher</p>
-      
-      <h2>Server Status Monitor</h2>
-      
-      <div class="server-buttons" id="server-buttons-container">
-        <!-- Server buttons will be inserted here dynamically -->
-      </div>
-      
-      <div class="row">
-        <button id="refresh-button">Refresh Status</button>
-        <button id="exit-button">Exit</button>
-      </div>
-      <p id="notice-label">Ready</p>
-    </main>
-  </body>
+    <h2>Servers</h2>
+
+    <div class="server-buttons" id="server-buttons-container">
+      <!-- Server buttons will be inserted here dynamically -->
+    </div>
+
+    <div class="row">
+      <button id="refresh-button">Refresh Status</button>
+      <button id="exit-button">Exit</button>
+    </div>
+    <p id="notice-label"></p>
+  </main>
+</body>
+
 </html>
