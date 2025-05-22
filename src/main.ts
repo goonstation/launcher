@@ -1,4 +1,5 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
+import { fetch } from '@tauri-apps/plugin-http';
 
 /**
  * Interface for server info from the API
@@ -10,12 +11,39 @@ interface ServerInfo {
   short_name: string;
   address: string;
   port: number;
-  active: string;
-  invisible: string;
-  created_at: string;
+  active: boolean | string;
+  invisible: boolean | string;
+  created_at: string | null;
   updated_at: string;
-  orchestrator: string;
-  byond_link: string;
+  orchestrator?: string;
+  byond_link?: string;
+}
+
+/**
+ * Interface for the API response
+ */
+interface ApiResponse {
+  data: ServerInfo[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 // DOM Elements
@@ -105,82 +133,55 @@ function initApp() {
 /**
  * Fetch server status information
  */
-function fetchServerStatus() {
+async function fetchServerStatus() {
   if (!noticeLabel || !refreshButton) return;
   
   // Update UI to show loading state
   noticeLabel.textContent = "Fetching server status...";
   refreshButton.disabled = true;
   
-  // For now, simulate getting server data with a mock
-  setTimeout(() => {
-    const mockServers = [
-      {
-        id: 1,
-        server_id: "main1",
-        name: "Goonstation 1 (RP)",
-        short_name: "RP #1",
-        address: "goonhub.com",
-        port: 26100,
-        active: "yes",
-        invisible: "no",
-        created_at: "2023-07-01T00:00:00Z",
-        updated_at: "2023-07-01T00:00:00Z",
-        orchestrator: "main",
-        byond_link: "byond://goonhub.com:26100"
-      },
-      {
-        id: 2,
-        server_id: "main2",
-        name: "Goonstation 2 (Classic)",
-        short_name: "Classic",
-        address: "goonhub.com",
-        port: 26200,
-        active: "yes",
-        invisible: "no",
-        created_at: "2023-07-01T00:00:00Z",
-        updated_at: "2023-07-01T00:00:00Z",
-        orchestrator: "main",
-        byond_link: "byond://goonhub.com:26200"
-      },
-      {
-        id: 3,
-        server_id: "dev",
-        name: "Goonstation Dev",
-        short_name: "Dev",
-        address: "goonhub.com",
-        port: 26400,
-        active: "yes",
-        invisible: "no",
-        created_at: "2023-07-01T00:00:00Z",
-        updated_at: "2023-07-01T00:00:00Z",
-        orchestrator: "dev",
-        byond_link: "byond://goonhub.com:26400"
-      }
-    ] as ServerInfo[];
+  try {    // Use Tauri's HTTP plugin to fetch data
+    const response = await fetch('https://api.goonhub.com/servers', {
+      method: 'GET'
+    });
     
+    // Check if response is successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const apiResponse: ApiResponse = await response.json();
+    const servers = apiResponse.data;
+    
+    // Process server data
+    const processedServers = servers.map(server => {
+      // Generate byond_link if it doesn't exist
+      if (!server.byond_link) {
+        server.byond_link = `byond://${server.address}:${server.port}`;
+      }
+      return server;
+    });
+    
+    updateServerDisplay(processedServers);
+    createServerButtons(processedServers);
+    
+    // Enable refresh button and update notice
+    if (refreshButton) refreshButton.disabled = false;
+    if (noticeLabel) {
+      const onlineCount = processedServers.filter(s => s.active === true || s.active === "yes").length;
+      noticeLabel.textContent = `Server status updated: ${onlineCount} servers online`;
+    }
+  } catch (error) {
+    console.error("Error fetching server status:", error);
+      // Use mock data as fallback if there's an error
+    const mockServers = getMockServerData();
     updateServerDisplay(mockServers);
     createServerButtons(mockServers);
     
-    // Enable refresh button and update notice
-    refreshButton!.disabled = false;
-    noticeLabel!.textContent = "Server status updated successfully!";
-  }, 1000);
-  
-  // In a real app, we'd use fetch API:
-  // fetch('https://api.goonhub.com/servers')
-  //   .then(response => response.json())
-  //   .then(servers => { 
-  //     updateServerDisplay(servers);
-  //     createServerButtons(servers);
-  //   })
-  //   .catch(error => {
-  //     noticeLabel.textContent = `Error: ${error.message}`;
-  //     statusDisplay.textContent = "Failed to fetch server status. Please try again.";
-  //   })
-  //   .finally(() => {
-  //     refreshButton.disabled = false;
-  //   });
+    // Update UI with error message
+    if (noticeLabel) noticeLabel.textContent = `Error fetching data. Using cached data.`;
+    if (refreshButton) refreshButton.disabled = false;
+  }
 }
 
 /**
@@ -195,7 +196,7 @@ function updateServerDisplay(servers: ServerInfo[]) {
   
   // We may want to update the notice label with server count
   if (noticeLabel) {
-    const onlineCount = servers.filter(s => s.active === "yes").length;
+    const onlineCount = servers.filter(s => s.active === true || s.active === "yes").length;
     noticeLabel.textContent = `${onlineCount} servers online`;
   }
 }
@@ -209,21 +210,91 @@ function createServerButtons(servers: ServerInfo[]) {
   // Clear existing buttons
   serverButtonsContainer.innerHTML = "";
   
+  // Sort servers: non-invisible first, then by ID
+  const visibleServers = servers.filter(s => s.invisible !== true && s.invisible !== "yes");
+  const invisibleServers = servers.filter(s => s.invisible === true || s.invisible === "yes");
+  
+  // Sort both arrays by ID
+  const sortedVisibleServers = visibleServers.sort((a, b) => a.id - b.id);
+  const sortedInvisibleServers = invisibleServers.sort((a, b) => a.id - b.id);
+  
+  // Combine both arrays, with visible servers first
+  const sortedServers = [...sortedVisibleServers, ...sortedInvisibleServers];
+  
   // Create buttons for each server
-  servers.forEach(server => {
+  sortedServers.forEach(server => {
     const button = document.createElement("button");
     button.textContent = `Join ${server.short_name}`;
     button.className = "server-button";
     
+    // Add status indicator to the button
+    const isOnline = server.active === true || server.active === "yes";
+    button.classList.add(isOnline ? "server-online" : "server-offline");
+    
+    // Add server ID as data attribute for reference
+    button.dataset.serverId = server.server_id;
+    
     // Add click handler
     button.addEventListener("click", () => {
-      alert(`Joining server ${server.name} at ${server.byond_link}`);
-      // In real app, launch the game with this server
-      // invoke("launch_game", { serverLink: server.byond_link });
+      // Only allow joining online servers
+      if (isOnline) {
+        alert(`Joining server ${server.name} at ${server.byond_link}`);
+        // In real app, launch the game with this server
+        // invoke("launch_game", { serverLink: server.byond_link });
+      } else {
+        alert(`Server ${server.name} is currently offline.`);
+      }
     });
     
     serverButtonsContainer!.appendChild(button);
   });
+}
+
+/**
+ * Get mock server data for fallback when API fails
+ */
+function getMockServerData(): ServerInfo[] {
+  return [
+    {
+      id: 1,
+      server_id: "main1",
+      name: "Goonstation 1 Classic: Heisenbee",
+      short_name: "Goon 1",
+      address: "goon1.goonhub.com",
+      port: 26100,
+      active: "yes",
+      invisible: "no",
+      created_at: null,
+      updated_at: "2025-01-30T15:23:38.000000Z",
+      byond_link: "byond://goon1.goonhub.com:26100"
+    },
+    {
+      id: 2,
+      server_id: "main2",
+      name: "Goonstation 2 Classic: Bombini",
+      short_name: "Goon 2",
+      address: "goon2.goonhub.com",
+      port: 26200,
+      active: "no",
+      invisible: "no",
+      created_at: null,
+      updated_at: "2025-01-30T15:23:38.000000Z",
+      byond_link: "byond://goon2.goonhub.com:26200"
+    },
+    {
+      id: 3,
+      server_id: "main3",
+      name: "Goonstation 3 Roleplay: Morty",
+      short_name: "Goon 3 RP",
+      address: "goon3.goonhub.com",
+      port: 26300,
+      active: "yes",
+      invisible: "no",
+      created_at: null,
+      updated_at: "2025-01-30T15:23:38.000000Z",
+      byond_link: "byond://goon3.goonhub.com:26300"
+    }
+  ];
 }
 
 // Initialize the app when DOM content is loaded

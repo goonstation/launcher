@@ -138,13 +138,49 @@ button {
 
 .server-button {
   min-width: 150px;
-  background-color: #24c8db;
   color: white;
   border: none;
+  position: relative;
+  padding-left: 1.5em;
 }
 
-.server-button:hover {
+.server-online {
+  background-color: #24c8db;
+}
+
+.server-online:hover {
   background-color: #1ba8b9;
+}
+
+.server-offline {
+  background-color: #9e9e9e;
+  cursor: not-allowed;
+}
+
+.server-offline:hover {
+  background-color: #8a8a8a;
+}
+
+/* Add status indicators */
+.server-online::before,
+.server-offline::before {
+  content: "";
+  position: absolute;
+  left: 0.6em;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.server-online::before {
+  background-color: #4caf50;
+  box-shadow: 0 0 5px #4caf50;
+}
+
+.server-offline::before {
+  background-color: #f44336;
 }
 
 #notice-label {
