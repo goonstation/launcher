@@ -1,5 +1,6 @@
 import { fetch } from "@tauri-apps/plugin-http";
 import { appCacheDir } from "@tauri-apps/api/path";
+import packageInfo from "../package.json";
 import {
   readTextFile,
   writeTextFile,
@@ -25,14 +26,25 @@ export interface ServerInfo {
   byond_link?: string;
 }
 
-// Track if we're using cached data
-let isUsingCachedData = false;
+/**
+ * Server data state enum
+ */
+export enum ServerDataState {
+  LOADING = "loading",
+  LOADED_FRESH = "loaded_fresh",
+  LOADED_CACHE = "loaded_cache",
+  REFRESHING = "refreshing",
+  ERROR = "error",
+}
+
+// Current data state
+let currentState = ServerDataState.LOADING;
 
 /**
- * Get whether we're using cached data
+ * Get current server data state
  */
-export function getIsUsingCachedData(): boolean {
-  return isUsingCachedData;
+export function getServerDataState(): ServerDataState {
+  return currentState;
 }
 
 /**
@@ -60,6 +72,29 @@ interface ApiResponse {
     to: number;
     total: number;
   };
+}
+
+/**
+ * Dispatch a server status event with data
+ */
+function dispatchServerEvent(
+  state: ServerDataState,
+  servers: ServerInfo[] = [],
+  error: Error | null = null
+) {
+  // Update internal state
+  currentState = state;
+
+  // Dispatch event to notify the UI
+  document.dispatchEvent(
+    new CustomEvent("server-status-update", {
+      detail: {
+        state,
+        servers,
+        error: error?.message || null,
+      },
+    })
+  );
 }
 
 /**
@@ -114,10 +149,78 @@ async function loadCachedServerData(): Promise<ServerInfo[] | null> {
  * Fetch server status information
  */
 export async function fetchServerStatus(): Promise<ServerInfo[]> {
+  // Set loading state immediately
+  dispatchServerEvent(ServerDataState.LOADING);
+
+  // Try to load cached data first
+  let cachedData: ServerInfo[] | null = null;
+  try {
+    cachedData = await loadCachedServerData();
+
+    if (cachedData) {
+      // Dispatch cached data event
+      dispatchServerEvent(ServerDataState.LOADED_CACHE, cachedData);
+
+      // Change to refreshing state
+      dispatchServerEvent(ServerDataState.REFRESHING, cachedData);
+
+      // Start fetch in background
+      fetchFreshData().catch((error) => {
+        console.error("Background fetch failed:", error);
+        // We stay in LOADED_CACHE state if refresh fails
+        dispatchServerEvent(
+          ServerDataState.LOADED_CACHE,
+          cachedData || [],
+          error
+        ); // Fix: use empty array if cachedData is null
+      });
+
+      // Return cached data immediately
+      return cachedData;
+    }
+  } catch (cachedError) {
+    console.error("Error loading cached data:", cachedError);
+    // Continue to fetch fresh data
+  }
+
+  // If no cached data or error loading cache, fetch directly and wait
+  try {
+    return await fetchFreshData();
+  } catch (error) {
+    if (error instanceof Error) {
+      // If we have cached data from earlier, use that with an error state
+      if (cachedData) {
+        dispatchServerEvent(ServerDataState.LOADED_CACHE, cachedData, error);
+        return cachedData;
+      }
+
+      // Otherwise report the error with empty data
+      dispatchServerEvent(ServerDataState.ERROR, [], error);
+    } else {
+      dispatchServerEvent(
+        ServerDataState.ERROR,
+        [],
+        new Error("Unknown error fetching server data")
+      );
+    }
+
+    // Return empty array on failure with no cache
+    return [];
+  }
+}
+
+/**
+ * Fetch fresh data from the server
+ */
+async function fetchFreshData(): Promise<ServerInfo[]> {
   try {
     // Use Tauri's HTTP plugin to fetch data
     const response = await fetch("https://api.goonhub.com/servers", {
       method: "GET",
+      headers: {
+        UserAgent: `GoonstationLauncher/${packageInfo.version}`,
+      },
+      connectTimeout: 5_000, // 5 seconds
     });
 
     // Check if response is successful
@@ -140,26 +243,15 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
     // Cache the successful response
     await cacheServerData(processedServers);
 
-    // Reset the cached data flag
-    isUsingCachedData = false;
+    // Dispatch fresh data event
+    dispatchServerEvent(ServerDataState.LOADED_FRESH, processedServers);
 
     return processedServers;
   } catch (error) {
     console.error("Error fetching server status:", error);
 
-    // Try to load cached data
-    const cachedData = await loadCachedServerData();
-
-    if (cachedData) {
-      // Set flag to indicate we're using cached data
-      isUsingCachedData = true;
-      return cachedData;
-    }
-
-    // If no cached data available, return empty array
-    isUsingCachedData = true;
-    console.error("No cached data available and network request failed");
-    return [];
+    // Propagate the error upward
+    throw error;
   }
 }
 
@@ -176,14 +268,12 @@ export function isServerOnline(server: ServerInfo): boolean {
 export function getSortedServers(servers: ServerInfo[]): ServerInfo[] {
   // Sort servers: non-invisible first, then by ID
   const visibleServers = servers.filter((s) => s.invisible !== true);
-  const invisibleServers = servers.filter((s) => s.invisible === true);
 
   // Sort both arrays by ID
   const sortedVisibleServers = visibleServers.sort((a, b) => a.id - b.id);
-  const sortedInvisibleServers = invisibleServers.sort((a, b) => a.id - b.id);
 
   // Combine both arrays, with visible servers first
-  return [...sortedVisibleServers, ...sortedInvisibleServers];
+  return sortedVisibleServers;
 }
 
 /**

@@ -5,7 +5,8 @@ import {
   isServerOnline,
   getSortedServers,
   getOnlineServerCount,
-  getIsUsingCachedData,
+  getServerDataState,
+  ServerDataState,
 } from "./serverService";
 
 // DOM Elements
@@ -51,12 +52,61 @@ function toggleAudio() {
     // Mute audio
     backgroundMusic.pause();
     muteButton.textContent = "🔇";
-    noticeLabel.textContent = "Audio muted";
+    noticeLabel.textContent = "🔇 music muted :(";
   } else {
     // Unmute audio
     backgroundMusic.play().catch(console.error);
     muteButton.textContent = "🔊";
-    noticeLabel.textContent = "Audio unmuted - Playing";
+    noticeLabel.textContent = "🔊 music unmuted :)";
+  }
+}
+
+/**
+ * Update the status notice based on server data state
+ */
+function updateStatusNotice(
+  state: ServerDataState,
+  servers: ServerInfo[] = [],
+  errorMessage: string | null = null
+) {
+  if (!noticeLabel || !refreshButton) return;
+
+  // Enable the refresh button for all states except LOADING
+  refreshButton.disabled = state === ServerDataState.LOADING;
+
+  // Remove all state classes
+  noticeLabel.classList.remove("warning", "error", "refreshing");
+
+  const onlineCount = getOnlineServerCount(servers);
+
+  // Set the message based on the state
+  switch (state) {
+    case ServerDataState.LOADING:
+      noticeLabel.textContent = "⏳ Fetching server status...";
+      break;
+
+    case ServerDataState.LOADED_FRESH:
+      noticeLabel.textContent = `✅ server status updated`;
+      break;
+
+    case ServerDataState.LOADED_CACHE:
+      noticeLabel.textContent = `⚠️ Using cached data (${onlineCount} servers online) - Connection failed`;
+      noticeLabel.classList.add("warning");
+      if (errorMessage) {
+        console.warn(`Connection issue: ${errorMessage}`);
+      }
+      break;
+
+    case ServerDataState.REFRESHING:
+      noticeLabel.textContent = `⏳ using cached data - refreshing...`;
+      noticeLabel.classList.add("refreshing");
+      break;
+
+    case ServerDataState.ERROR:
+      noticeLabel.textContent =
+        errorMessage || "Error updating servers. Please try again.";
+      noticeLabel.classList.add("error");
+      break;
   }
 }
 
@@ -81,6 +131,7 @@ function initApp() {
       updateServerStatus();
     });
   }
+
   if (exitButton) {
     exitButton.addEventListener("click", async () => {
       if (noticeLabel) noticeLabel.textContent = "Exiting application...";
@@ -88,6 +139,31 @@ function initApp() {
       await getCurrentWindow().close();
     });
   }
+
+  // Listen for server status updates
+  document.addEventListener("server-status-update", ((event: CustomEvent) => {
+    const { state, servers, error } = event.detail;
+
+    // Update UI based on the server state
+    updateStatusNotice(state, servers, error);
+
+    // Only update the server buttons if we have data
+    if (servers && servers.length > 0) {
+      createServerButtons(servers);
+    }
+  }) as EventListener);
+
+  // Start periodic refresh (every 30 seconds)
+  setInterval(() => {
+    // Don't auto-refresh if we're already in loading/refreshing state
+    const currentState = getServerDataState();
+    if (
+      currentState !== ServerDataState.LOADING &&
+      currentState !== ServerDataState.REFRESHING
+    ) {
+      fetchServerStatus().catch(console.error);
+    }
+  }, 30000);
 
   // Fetch server status initially
   updateServerStatus();
@@ -97,58 +173,12 @@ function initApp() {
  * Update server status information
  */
 async function updateServerStatus() {
-  if (!noticeLabel || !refreshButton) return;
-
-  // Update UI to show loading state
-  noticeLabel.textContent = "Fetching server status...";
-  refreshButton.disabled = true;
-
   try {
-    // Get server data
-    const servers = await fetchServerStatus();
-
-    // Update the UI with server data
-    updateServerDisplay(servers);
-    createServerButtons(servers);
-
-    // Enable refresh button and update notice
-    if (refreshButton) refreshButton.disabled = false;
-
-    if (noticeLabel) {
-      const onlineCount = getOnlineServerCount(servers);
-
-      // Show special message if using cached data
-      if (getIsUsingCachedData()) {
-        noticeLabel.textContent = `⚠️ Using cached data (${onlineCount} servers online) - Connection failed`;
-        noticeLabel.classList.add("warning");
-      } else {
-        noticeLabel.textContent = `Server status updated: ${onlineCount} servers online`;
-        noticeLabel.classList.remove("warning");
-      }
-    }
+    // This will trigger the server-status-update event
+    await fetchServerStatus();
   } catch (error) {
-    console.error("Error updating server status:", error);
-
-    // Update UI with error message
-    if (noticeLabel)
-      noticeLabel.textContent = `Error updating servers. Please try again.`;
-    if (refreshButton) refreshButton.disabled = false;
-  }
-}
-
-/**
- * Update the server status display
- */
-function updateServerDisplay(servers: ServerInfo[]) {
-  // This function previously updated the text display
-  // Now it's just a pass-through since we don't need the status text box
-
-  console.log("Server status updated:", servers.length, "servers found");
-
-  // We may want to update the notice label with server count
-  if (noticeLabel) {
-    const onlineCount = getOnlineServerCount(servers);
-    noticeLabel.textContent = `${onlineCount} servers online`;
+    console.error("Error in updateServerStatus:", error);
+    // The event system will handle displaying the error
   }
 }
 
