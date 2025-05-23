@@ -66,7 +66,6 @@ function toggleAudio() {
  */
 function updateStatusNotice(
   state: ServerDataState,
-  servers: ServerInfo[] = [],
   errorMessage: string | null = null
 ) {
   if (!noticeLabel || !refreshButton) return;
@@ -76,8 +75,6 @@ function updateStatusNotice(
 
   // Remove all state classes
   noticeLabel.classList.remove("warning", "error", "refreshing");
-
-  const onlineCount = getOnlineServerCount(servers);
 
   // Set the message based on the state
   switch (state) {
@@ -90,7 +87,7 @@ function updateStatusNotice(
       break;
 
     case ServerDataState.LOADED_CACHE:
-      noticeLabel.textContent = `⚠️ Using cached data (${onlineCount} servers online) - Connection failed`;
+      noticeLabel.textContent = `⚠️ using cached data - connection failed`;
       noticeLabel.classList.add("warning");
       if (errorMessage) {
         console.warn(`Connection issue: ${errorMessage}`);
@@ -98,13 +95,13 @@ function updateStatusNotice(
       break;
 
     case ServerDataState.REFRESHING:
-      noticeLabel.textContent = `⏳ using cached data - refreshing...`;
+      noticeLabel.textContent = `⏳ refreshing...`;
       noticeLabel.classList.add("refreshing");
       break;
 
     case ServerDataState.ERROR:
       noticeLabel.textContent =
-        errorMessage || "Error updating servers. Please try again.";
+        errorMessage || "❌ error updating servers - please try again";
       noticeLabel.classList.add("error");
       break;
   }
@@ -145,15 +142,15 @@ function initApp() {
     const { state, servers, error } = event.detail;
 
     // Update UI based on the server state
-    updateStatusNotice(state, servers, error);
+    updateStatusNotice(state, error);
 
     // Only update the server buttons if we have data
-    if (servers && servers.length > 0) {
+    if (servers?.length > 0) {
       createServerButtons(servers);
     }
   }) as EventListener);
 
-  // Start periodic refresh (every 30 seconds)
+  //
   setInterval(() => {
     // Don't auto-refresh if we're already in loading/refreshing state
     const currentState = getServerDataState();
@@ -163,10 +160,11 @@ function initApp() {
     ) {
       fetchServerStatus().catch(console.error);
     }
-  }, 30000);
-
-  // Fetch server status initially
-  updateServerStatus();
+  }, 20_000);
+  +(
+    // Fetch server status initially
+    updateServerStatus()
+  );
 }
 
 /**
@@ -197,7 +195,7 @@ function createServerButtons(servers: ServerInfo[]) {
   // Create buttons for each server
   sortedServers.forEach((server) => {
     const button = document.createElement("button");
-    button.textContent = `Join ${server.short_name}`;
+    button.textContent = `${server.short_name} Map: Cogmap2 69 online`;
     button.className = "server-button";
 
     // Add status indicator to the button

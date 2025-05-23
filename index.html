@@ -10,7 +10,6 @@
 </head>
 
 <body>
-  <!-- Audio element for background music -->
   <audio id="background-music" loop>
     <source src="/src/assets/after_party.ogg" type="audio/ogg">
     Your browser does not support the audio element.
@@ -18,16 +17,17 @@
 
   <button id="mute-button" class="mute-button">🔊</button>
 
+  <img src="/src/assets/goonstation.ico" class="logo background-icon" alt="Goonstation logo" />
+
   <main class="container">
-    <div class="row">
+    <div class="app-header retro-frame">
       <h1>Goonstation Launcher</h1>
-      <img src="/src/assets/goonstation.ico" class="logo" alt="Goonstation logo" />
     </div>
 
-    <h2>Servers</h2>
-
-    <div class="server-buttons" id="server-buttons-container">
-      <!-- Server buttons will be inserted here dynamically -->
+    <div class="retro-frame">
+      <div class="server-buttons" id="server-buttons-container">
+        <!-- Server buttons will be inserted here dynamically -->
+      </div>
     </div>
 
     <div class="row">
