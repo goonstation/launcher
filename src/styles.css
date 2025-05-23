@@ -9,6 +9,7 @@ body {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 2 2"><rect width="1" height="1" fill="rgba(0,255,255,0.2)"/></svg>');
   background-repeat: repeat;
   overflow: hidden;
+  font-family: Consolas, "Courier New", monospace;
 }
 
 .container {
@@ -40,7 +41,7 @@ body {
 }
 
 .retro-frame {
-  border: 1px solid var(--button-border);
+  border: 0.1rem solid var(--button-border);
   border-radius: 4px;
   background-color: rgba(0, 0, 30, 0.7);
   box-shadow: 0 0 0 1px #000066, inset 0 0 10px rgba(0, 200, 255, 0.3),
@@ -51,11 +52,11 @@ body {
 
 .mute-button {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.25rem;
   font-size: 1.5em;
   display: flex;
   align-items: center;
@@ -63,12 +64,12 @@ body {
   padding: 0;
   z-index: 1000;
   cursor: pointer;
-  background: linear-gradient(to bottom, #444444, #222222);
-  border: 1px solid #00ccff;
-  box-shadow: 0 0 0 1px #000066, inset 0 0 5px rgba(0, 200, 255, 0.5),
-    0 0 8px rgba(0, 200, 255, 0.5);
+  background: linear-gradient(to bottom, #555, #151515);
+  border: 0.06rem solid #00ccff;
+  box-shadow: 0 0 0 0.06rem #000066, inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
+    0 0 0.5rem rgba(0, 200, 255, 0.5);
   color: var(--text-color);
-  text-shadow: 0 0 5px var(--text-color);
+  text-shadow: 0 0 0.3rem var(--text-color);
 }
 
 .mute-button:hover {
@@ -165,18 +166,19 @@ button {
 
 #notice-label {
   position: fixed;
-  bottom: 0.5rem;
-  left: 0.5rem;
-  padding: 0.3rem 0.7rem;
-  font-family: "Courier New", monospace;
+  bottom: 0;
+  left: 0;
+  margin: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  font-family: Consolas, "Courier New", monospace;
   font-style: italic;
   color: #00ff00;
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #00ff00;
-  border-radius: 3px;
+  border-radius: 0.3rem;
   box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+  text-shadow: 0 0 3px rgba(0, 255, 0, 0.7);
 }
 
 #notice-label.warning {
@@ -184,7 +186,7 @@ button {
   border-color: #ffff00;
   box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 255, 0, 0.3),
     0 0 8px rgba(255, 255, 0, 0.5);
-  text-shadow: 0 0 5px rgba(255, 255, 0, 0.7);
+  text-shadow: 0 0 3px rgba(255, 255, 0, 0.7);
 }
 
 #notice-label.error {
@@ -192,7 +194,7 @@ button {
   border-color: #ff0000;
   box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
-  text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+  text-shadow: 0 0 3px rgba(255, 0, 0, 0.7);
 }
 
 #notice-label.refreshing {
@@ -216,8 +218,10 @@ button {
   position: absolute;
   top: 50%;
   right: 0;
-  transform: translateY(-50%) scale(4);
+  transform: translateY(-50%) scale(10);
   z-index: -1;
   opacity: 0.2;
   pointer-events: none;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
 }
