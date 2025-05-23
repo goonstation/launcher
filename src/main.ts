@@ -4,7 +4,6 @@ import {
   fetchServerStatus,
   isServerOnline,
   getSortedServers,
-  getOnlineServerCount,
   getServerDataState,
   ServerDataState,
 } from "./serverService";
@@ -16,6 +15,7 @@ let serverButtonsContainer: HTMLElement | null;
 let refreshButton: HTMLButtonElement | null;
 let exitButton: HTMLButtonElement | null;
 let noticeLabel: HTMLElement | null;
+let settingsButton: HTMLButtonElement | null;
 
 // Audio state
 let isMuted = false;
@@ -52,11 +52,13 @@ function toggleAudio() {
     // Mute audio
     backgroundMusic.pause();
     muteButton.textContent = "🔇";
+    muteButton.classList.add("muted");
     noticeLabel.textContent = "🔇 music muted :(";
   } else {
     // Unmute audio
     backgroundMusic.play().catch(console.error);
     muteButton.textContent = "🔊";
+    muteButton.classList.remove("muted");
     noticeLabel.textContent = "🔊 music unmuted :)";
   }
 }
@@ -118,6 +120,7 @@ function initApp() {
   refreshButton = document.querySelector("#refresh-button");
   exitButton = document.querySelector("#exit-button");
   noticeLabel = document.querySelector("#notice-label");
+  settingsButton = document.querySelector("#settings-button");
 
   // Initialize audio
   initAudio();
@@ -134,6 +137,18 @@ function initApp() {
       if (noticeLabel) noticeLabel.textContent = "Exiting application...";
 
       await getCurrentWindow().close();
+    });
+  }
+
+  if (settingsButton) {
+    settingsButton.addEventListener("click", () => {
+      toggleSettingsModal(true);
+    });
+  }
+  const closeModalButton = document.querySelector("#close-modal-button");
+  if (closeModalButton) {
+    closeModalButton.addEventListener("click", () => {
+      toggleSettingsModal(false);
     });
   }
 
@@ -195,8 +210,24 @@ function createServerButtons(servers: ServerInfo[]) {
   // Create buttons for each server
   sortedServers.forEach((server) => {
     const button = document.createElement("button");
-    button.textContent = `${server.short_name} Map: Cogmap2 69 online`;
-    button.className = "server-button";
+    button.className = "server-button styled";
+
+    // Add separate lines via spans
+    const line1 = document.createElement("span");
+    line1.style.display = "block";
+    line1.textContent = server.short_name;
+
+    const line2 = document.createElement("span");
+    line2.style.display = "block";
+    line2.textContent = "Cogmap2";
+
+    const line3 = document.createElement("span");
+    line3.style.display = "block";
+    line3.textContent = `69 online`;
+
+    button.appendChild(line1);
+    button.appendChild(line2);
+    button.appendChild(line3);
 
     // Add status indicator to the button
     const serverOnline = isServerOnline(server);
@@ -217,6 +248,15 @@ function createServerButtons(servers: ServerInfo[]) {
 
     serverButtonsContainer!.appendChild(button);
   });
+}
+
+/**
+ * Toggle the settings modal
+ */
+function toggleSettingsModal(show: boolean) {
+  const modal = document.querySelector("#settings-modal");
+  if (!modal) return;
+  modal.classList.toggle("hidden", !show);
 }
 
 // Initialize the app when DOM content is loaded

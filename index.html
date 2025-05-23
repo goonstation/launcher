@@ -15,11 +15,12 @@
     Your browser does not support the audio element.
   </audio>
 
-  <button id="mute-button" class="mute-button">🔊</button>
+  <button id="mute-button" class="config-button mute-button">🔊</button>
+  <button id="settings-button" class="config-button settings-button">⚙️</button>
 
   <img src="/src/assets/FatAndSassySpaceBee.gif" class="logo background-icon" alt="Goonstation logo" />
 
-  <main class="container">
+  <main>
     <div class="app-header retro-frame">
       <h1>Goonstation Launcher</h1>
     </div>
@@ -31,11 +32,32 @@
     </div>
 
     <div class="row">
-      <button id="refresh-button">Refresh Status</button>
-      <button id="exit-button">Exit</button>
+      <button id="refresh-button" class="styled">Refresh Status</button>
+      <button id="exit-button" class="styled">Exit</button>
     </div>
     <p id="notice-label"></p>
   </main>
+
+  <div id="settings-modal" class="modal hidden retro-frame">
+    <div class="topbar">
+      <div class="title">Settings</div>
+      <button id="close-modal-button">×</button>
+    </div>
+
+    <form>
+      <button id="install-byond">Install BYOND</button>
+      <label for="byond-path">BYOND PATH:</label>
+      <input type="text" id="byond-path" />
+      <label for="byond-mode">Launch Method:</label>
+      <select id="byond-mode">
+        <option value="dreamseeker">DreamSeeker</option>
+        <option value="pager">BYOND Pager</option>
+      </select>
+      <br />
+      <br />
+      <button type="submit" id="settings-submit">Submit Changes</button>
+    </form>
+  </div>
 </body>
 
 </html>

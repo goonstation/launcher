@@ -2,8 +2,6 @@
 @import "./join-buttons.css";
 
 body {
-  margin: 0;
-  padding: 0;
   min-height: 100vh;
   background-color: var(--dark-bg);
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 2 2"><rect width="1" height="1" fill="rgba(0,255,255,0.2)"/></svg>');
@@ -12,14 +10,9 @@ body {
   font-family: Consolas, "Courier New", monospace;
 }
 
-.container {
-  margin: 0;
+main {
   padding-top: 5vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  max-width: 800px;
+  max-width: 50rem;
   margin: 0 auto;
 }
 
@@ -50,41 +43,43 @@ body {
   margin-bottom: 20px;
 }
 
-.mute-button {
+.config-button {
   position: fixed;
-  top: 0.625rem;
-  right: 0.625rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 0.25rem;
-  font-size: 1.5em;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  z-index: 1000;
-  cursor: pointer;
+  font-size: 1.5em;
+  line-height: 0;
   background: linear-gradient(to bottom, #555, #151515);
   border: 0.06rem solid #00ccff;
+  border-radius: 0.25rem;
   box-shadow: 0 0 0 0.06rem #000066, inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
     0 0 0.5rem rgba(0, 200, 255, 0.5);
-  color: var(--text-color);
-  text-shadow: 0 0 0.3rem var(--text-color);
+  text-shadow: 0 0 0.2rem var(--text-color);
 }
 
-.mute-button:hover {
-  background: linear-gradient(to bottom, #555555, #333333);
+.config-button:hover {
+  background: linear-gradient(to bottom, #555, #222);
+}
+
+.mute-button {
+  right: 0.5rem;
+}
+
+.mute-button.muted {
+  text-indent: -3.5px;
+}
+
+.settings-button {
+  right: 3.5rem;
 }
 
 .logo {
   height: 6em;
   padding: 1.5em;
-  will-change: filter;
   transition: 0.75s;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em var(--highlight-color));
 }
 
 .row {
@@ -111,15 +106,13 @@ h1 {
   letter-spacing: 2px;
 }
 
-input,
-button {
+.styled {
   border-radius: 4px;
   border: 1px solid var(--button-border);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: "Courier New", monospace;
-  color: var(--text-color);
   background: linear-gradient(
     to bottom,
     var(--button-gradient-start),
@@ -130,9 +123,6 @@ button {
     0 0 8px rgba(0, 200, 255, 0.5);
   text-shadow: 0 0 5px var(--text-color);
   outline: none;
-}
-
-button {
   cursor: pointer;
   position: relative;
 }
@@ -224,4 +214,76 @@ button {
   pointer-events: none;
   image-rendering: pixelated;
   -ms-interpolation-mode: nearest-neighbor;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  font-family: "Tahoma", Courier, monospace;
+  font-smooth: never;
+  -webkit-font-smoothing: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  padding: 0;
+  background-color: #bfbfbf;
+  border: 2px solid #5b5b5b;
+  border-radius: 0;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  min-width: 300px;
+  margin: 0;
+}
+
+.modal .topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  background-color: #01007e;
+  padding: 2px 2px;
+  font-family: "Trebuchet MS", sans-serif;
+  font-weight: bold;
+}
+
+.modal .topbar .title {
+  font-size: 0.8rem;
+}
+
+.modal form {
+  padding: 1rem;
+}
+
+.modal label {
+  display: block;
+  text-align: left;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+#close-modal-button {
+  background: none;
+  color: #000;
+  background-color: #bfbfbf;
+  border: 1px outset #8a8a8a;
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+#close-modal-button:hover {
+  background-color: #c14040;
+}
+
+#close-modal-button:active {
+  border: 1px inset #8a8a8a;
+}
+
+.hidden {
+  display: none;
 }

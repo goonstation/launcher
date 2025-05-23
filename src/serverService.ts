@@ -9,45 +9,6 @@ import {
 } from "@tauri-apps/plugin-fs";
 
 /**
- * Interface for server info from the API
- */
-export interface ServerInfo {
-  id: number;
-  server_id: string;
-  name: string;
-  short_name: string;
-  address: string;
-  port: number;
-  active: boolean;
-  invisible: boolean;
-  created_at: string | null;
-  updated_at: string;
-  orchestrator?: string;
-  byond_link?: string;
-}
-
-/**
- * Server data state enum
- */
-export enum ServerDataState {
-  LOADING = "loading",
-  LOADED_FRESH = "loaded_fresh",
-  LOADED_CACHE = "loaded_cache",
-  REFRESHING = "refreshing",
-  ERROR = "error",
-}
-
-// Current data state
-let currentState = ServerDataState.LOADING;
-
-/**
- * Get current server data state
- */
-export function getServerDataState(): ServerDataState {
-  return currentState;
-}
-
-/**
  * Interface for the API response
  */
 interface ApiResponse {
@@ -72,6 +33,44 @@ interface ApiResponse {
     to: number;
     total: number;
   };
+}
+
+/**
+ * Interface for server info from the API
+ */
+export interface ServerInfo {
+  id: number;
+  server_id: string;
+  name: string;
+  short_name: string;
+  address: string;
+  port: number;
+  active: boolean;
+  invisible: boolean;
+  created_at: string;
+  updated_at: string;
+  byond_link?: string;
+}
+
+/**
+ * Server data state enum
+ */
+export enum ServerDataState {
+  LOADING = "loading",
+  LOADED_FRESH = "loaded_fresh",
+  LOADED_CACHE = "loaded_cache",
+  REFRESHING = "refreshing",
+  ERROR = "error",
+}
+
+// Current data state
+let currentState = ServerDataState.LOADING;
+
+/**
+ * Get current server data state
+ */
+export function getServerDataState(): ServerDataState {
+  return currentState;
 }
 
 /**
@@ -274,11 +273,4 @@ export function getSortedServers(servers: ServerInfo[]): ServerInfo[] {
 
   // Combine both arrays, with visible servers first
   return sortedVisibleServers;
-}
-
-/**
- * Count online servers
- */
-export function getOnlineServerCount(servers: ServerInfo[]): number {
-  return servers.filter((server) => isServerOnline(server)).length;
 }

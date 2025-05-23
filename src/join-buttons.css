@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
-  margin: 20px 0;
+  margin: 0.5rem 0;
 }
 
 .server-button {
@@ -12,9 +12,11 @@
   font-family: "Courier New", monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
-.server-online {
+.server-button.server-online {
   background: linear-gradient(to bottom, #006633, #003311);
   border: 1px solid var(--status-online);
   box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
@@ -26,7 +28,7 @@
     0 0 15px rgba(0, 255, 0, 0.7);
 }
 
-.server-offline {
+.server-button.server-offline {
   background: linear-gradient(to bottom, #660000, #330000);
   border: 1px solid var(--status-offline);
   box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
