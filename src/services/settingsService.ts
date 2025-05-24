@@ -82,7 +82,11 @@ async function loadSettings(): Promise<UserSettings | null> {
     const settingsData = await readTextFile(settingsPath);
     const settings = JSON.parse(settingsData) as UserSettings;
 
-    if (!(settings.launchMethod in LaunchMethod)) {
+    // Check if the launch method value is valid
+    const isValidLaunchMethod = Object.values(LaunchMethod).includes(
+      settings.launchMethod as LaunchMethod,
+    );
+    if (!isValidLaunchMethod) {
       settings.launchMethod = DEFAULT_SETTINGS.launchMethod;
     }
 
