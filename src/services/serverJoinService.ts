@@ -4,16 +4,16 @@ import { openUrl } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
 import { ServerInfo } from "./serverService.ts";
 import { getSettings, LaunchMethod } from "./settingsService.ts";
+import { setNoticeMessage } from "./uiService.ts";
 
 /** Join a server using the configured BYOND settings */
 export async function joinServer(
   server: ServerInfo,
-  noticeElement: HTMLElement,
 ) {
   try {
     const settings = await getSettings();
 
-    noticeElement.textContent = `Joining ${server.name}...`;
+    setNoticeMessage(`Joining ${server.name}...`);
 
     console.log(
       `Joining server using ${settings.launchMethod} at ${settings.byondPath}`,
@@ -25,8 +25,7 @@ export async function joinServer(
     console.log(`Server link: ${byondUrl}`);
     if (settings.launchMethod === LaunchMethod.BYOND_PAGER) {
       await openUrl(byondUrl);
-      noticeElement.textContent =
-        `✅ Opened ${server.short_name} in BYOND pager`;
+      setNoticeMessage(`✅ Opened ${server.short_name} in BYOND pager`);
     } else if (settings.launchMethod === LaunchMethod.DREAM_SEEKER) {
       // Launch DreamSeeker directly with the server address using Rust function
       try {
@@ -41,25 +40,29 @@ export async function joinServer(
         });
 
         console.log("DreamSeeker launch result:", result);
-        noticeElement.textContent =
-          `✅ Started DreamSeeker for ${server.short_name}`;
+        setNoticeMessage(`✅ Started DreamSeeker for ${server.short_name}`);
       } catch (execError) {
         console.error("Error launching DreamSeeker:", execError);
-        noticeElement.textContent = `❌ Failed to launch DreamSeeker: ${
-          execError instanceof Error ? execError.message : String(execError)
-        }`;
+        setNoticeMessage(
+          `❌ Failed to launch DreamSeeker: ${
+            execError instanceof Error ? execError.message : String(execError)
+          }`,
+          true,
+        );
       }
     } else {
       // For other methods (to be implemented)
-      noticeElement.textContent =
-        `🚀 Joining ${server.short_name} via ${settings.launchMethod}`;
+      setNoticeMessage(
+        `🚀 Joining ${server.short_name} via ${settings.launchMethod}`,
+      );
       setTimeout(() => {
-        noticeElement.textContent =
-          `✅ Started ${settings.launchMethod} for ${server.short_name}`;
+        setNoticeMessage(
+          `✅ Started ${settings.launchMethod} for ${server.short_name}`,
+        );
       }, 2000);
     }
   } catch (error) {
     console.error("Error joining server:", error);
-    noticeElement.textContent = "❌ Error joining server";
+    setNoticeMessage("❌ Error joining server", true);
   }
 }

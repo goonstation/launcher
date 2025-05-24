@@ -7,17 +7,12 @@ import {
 } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
 
-let noticeLabel: HTMLElement;
-
 /**
  * Initialize settings UI service
  */
 export function initSettingsUIService(
   settingsBtn: HTMLButtonElement,
-  noticeLabelElement: HTMLElement,
 ) {
-  noticeLabel = noticeLabelElement;
-
   // Set up settings button click handler
   settingsBtn.addEventListener("click", () => {
     const modal = document.querySelector("#settings-modal");
@@ -87,9 +82,8 @@ async function handleSettingsSubmit(event: Event) {
       // Provide feedback
       setNoticeMessage("✅ Settings saved successfully");
       setTimeout(() => {
-        if (noticeLabel.textContent === "✅ Settings saved successfully") {
-          setNoticeMessage("");
-        }
+        // Clear the message if it hasn't been changed
+        setNoticeMessage("");
       }, 3000);
 
       // Close the modal

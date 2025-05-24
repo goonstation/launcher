@@ -38,15 +38,15 @@ export function updateStatusNotice(
   // Set the message based on the state
   switch (state) {
     case ServerDataState.LOADING:
-      noticeLabel.textContent = "⏳ Fetching server status...";
+      setNoticeMessage("⏳ Fetching server status...");
       break;
 
     case ServerDataState.LOADED_FRESH:
-      noticeLabel.textContent = `✅ server status updated`;
+      setNoticeMessage(`✅ server status updated`);
       break;
 
     case ServerDataState.LOADED_CACHE:
-      noticeLabel.textContent = `⚠️ using cached data - connection failed`;
+      setNoticeMessage(`⚠️ using cached data - connection failed`);
       noticeLabel.classList.add("warning");
       if (errorMessage) {
         console.warn(`Connection issue: ${errorMessage}`);
@@ -54,14 +54,15 @@ export function updateStatusNotice(
       break;
 
     case ServerDataState.REFRESHING:
-      noticeLabel.textContent = `⏳ refreshing...`;
+      setNoticeMessage(`⏳ refreshing...`);
       noticeLabel.classList.add("refreshing");
       break;
 
     case ServerDataState.ERROR:
-      noticeLabel.textContent = errorMessage ||
-        "❌ error updating servers - please try again";
-      noticeLabel.classList.add("error");
+      setNoticeMessage(
+        errorMessage || "❌ error updating servers - please try again",
+        true,
+      );
       break;
   }
 }
@@ -99,16 +100,12 @@ export function createServerButtons(servers: ServerInfo[]) {
     const serverOnline = isServerOnline(server);
     button.classList.add(serverOnline ? "server-online" : "server-offline");
 
-    // Add server ID as data attribute for reference
-    button.dataset.serverId = server.server_id;
-
-    // Add click handler
     button.addEventListener("click", () => {
       // Only allow joining online servers
       if (serverOnline) {
-        joinServer(server, noticeLabel);
+        joinServer(server);
       } else {
-        noticeLabel.textContent = `${server.name} is currently offline.`;
+        setNoticeMessage(`❌ ${server.name} is currently offline.`);
       }
     });
 
@@ -116,9 +113,7 @@ export function createServerButtons(servers: ServerInfo[]) {
   });
 }
 
-/**
- * Set notice message
- */
+/** Set notice message */
 export function setNoticeMessage(message: string, isError = false) {
   noticeLabel.textContent = message;
   noticeLabel.classList.toggle("error", isError);
