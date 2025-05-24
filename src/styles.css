@@ -17,20 +17,8 @@ main {
 }
 
 .app-header {
-  text-align: center;
-  margin-top: 2em;
-  text-shadow: 0 0 1px var(--text-color), 0 0 30px var(--highlight-color);
-  font-family: "Arial Black", Gadget, sans-serif;
-}
-
-.app-header h1 {
-  font-size: 2.5em;
-  margin-bottom: 0.2em;
-  background: linear-gradient(to right, #00ffff, #ffffff, #00ffff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.7));
+  position: absolute;
+  margin-top: 1rem;
 }
 
 .retro-frame {
@@ -97,13 +85,6 @@ a {
 a:hover {
   color: var(--highlight-color);
   text-shadow: 0 0 5px var(--highlight-color);
-}
-
-h1 {
-  text-align: center;
-  font-family: "Arial Black", Gadget, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 }
 
 .styled {

@@ -14,11 +14,11 @@
     "windows": [
       {
         "title": "Goonstation Launcher",
-        "width": 800,
-        "height": 600,
+        "width": 700,
+        "height": 500,
         "resizable": true,
         "center": true,
-        "backgroundColor": "#2f2f2f"
+        "backgroundColor": "#000033"
       }
     ],
     "security": {
