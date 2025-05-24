@@ -1,34 +1,37 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { initAudioService } from "./services/audioService";
+import { initAudioService } from "./services/audioService.ts";
 import {
   fetchServerStatus,
   startServerStatusRefresh,
-} from "./services/serverService";
-import { getSettings } from "./services/settingsService";
-import { initSettingsUIService } from "./services/settingsUIService";
+} from "./services/serverService.ts";
+import { getSettings } from "./services/settingsService.ts";
+import { initSettingsUIService } from "./services/settingsUIService.ts";
 import {
   createServerButtons,
   initUIService,
   updateStatusNotice,
-} from "./services/uiService";
+} from "./services/uiService.ts";
 
 /**
  * Initialize the application
  */
 function initApp() {
   // Get references to DOM elements
-  const backgroundMusic =
-    document.querySelector<HTMLAudioElement>("#background-music")!;
+  const backgroundMusic = document.querySelector<HTMLAudioElement>(
+    "#background-music",
+  )!;
   const muteButton = document.querySelector<HTMLButtonElement>("#mute-button")!;
   const serverButtonsContainer = document.querySelector<HTMLElement>(
     "#server-buttons-container",
   )!;
-  const refreshButton =
-    document.querySelector<HTMLButtonElement>("#refresh-button")!;
+  const refreshButton = document.querySelector<HTMLButtonElement>(
+    "#refresh-button",
+  )!;
   const exitButton = document.querySelector<HTMLButtonElement>("#exit-button")!;
   const noticeLabel = document.querySelector<HTMLElement>("#notice-label")!;
-  const settingsButton =
-    document.querySelector<HTMLButtonElement>("#settings-button")!;
+  const settingsButton = document.querySelector<HTMLButtonElement>(
+    "#settings-button",
+  )!;
 
   // Initialize services
   initAudioService(backgroundMusic, muteButton, noticeLabel);
@@ -49,17 +52,20 @@ function initApp() {
   });
 
   // Listen for server status updates
-  document.addEventListener("server-status-update", ((event: CustomEvent) => {
-    const { state, servers, error } = event.detail;
+  document.addEventListener(
+    "server-status-update",
+    ((event: CustomEvent) => {
+      const { state, servers, error } = event.detail;
 
-    // Update UI based on the server state
-    updateStatusNotice(state, error);
+      // Update UI based on the server state
+      updateStatusNotice(state, error);
 
-    // Only update the server buttons if we have data
-    if (servers?.length > 0) {
-      createServerButtons(servers);
-    }
-  }) as EventListener);
+      // Only update the server buttons if we have data
+      if (servers?.length > 0) {
+        createServerButtons(servers);
+      }
+    }) as EventListener,
+  );
 
   // Start server status refresh
   startServerStatusRefresh();
@@ -79,4 +85,4 @@ async function updateServerStatus() {
 }
 
 // Initialize the app when DOM content is loaded
-window.addEventListener("DOMContentLoaded", initApp);
+globalThis.addEventListener("DOMContentLoaded", initApp);

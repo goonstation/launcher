@@ -25,7 +25,9 @@ main {
   border: 0.1rem solid var(--button-border);
   border-radius: 4px;
   background-color: rgba(0, 0, 30, 0.7);
-  box-shadow: 0 0 0 1px #000066, inset 0 0 10px rgba(0, 200, 255, 0.3),
+  box-shadow:
+    0 0 0 1px #000066,
+    inset 0 0 10px rgba(0, 200, 255, 0.3),
     0 0 15px rgba(0, 200, 255, 0.5);
   padding: 15px;
   margin-bottom: 20px;
@@ -43,7 +45,9 @@ main {
   background: linear-gradient(to bottom, #555, #151515);
   border: 0.06rem solid #00ccff;
   border-radius: 0.25rem;
-  box-shadow: 0 0 0 0.06rem #000066, inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
+  box-shadow:
+    0 0 0 0.06rem #000066,
+    inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
     0 0 0.5rem rgba(0, 200, 255, 0.5);
   text-shadow: 0 0 0.2rem var(--text-color);
 }
@@ -100,7 +104,9 @@ a:hover {
     var(--button-gradient-end)
   );
   transition: all 0.25s;
-  box-shadow: 0 0 0 1px #000066, inset 0 0 5px rgba(0, 200, 255, 0.5),
+  box-shadow:
+    0 0 0 1px #000066,
+    inset 0 0 5px rgba(0, 200, 255, 0.5),
     0 0 8px rgba(0, 200, 255, 0.5);
   text-shadow: 0 0 5px var(--text-color);
   outline: none;
@@ -113,12 +119,16 @@ a:hover {
   color: white;
   margin-right: 10px;
   border: 1px solid var(--status-online);
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
 }
 
 #refresh-button:hover {
-  box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(0, 255, 0, 0.5),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 10px rgba(0, 255, 0, 0.5),
     0 0 15px rgba(0, 255, 0, 0.7);
 }
 
@@ -126,12 +136,16 @@ a:hover {
   background: linear-gradient(to bottom, #660000, #330000);
   color: white;
   border: 1px solid var(--status-offline);
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
 }
 
 #exit-button:hover {
-  box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(255, 0, 0, 0.5),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 10px rgba(255, 0, 0, 0.5),
     0 0 15px rgba(255, 0, 0, 0.7);
 }
 
@@ -147,7 +161,9 @@ a:hover {
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #00ff00;
   border-radius: 0.3rem;
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
   text-shadow: 0 0 3px rgba(0, 255, 0, 0.7);
 }
@@ -155,7 +171,9 @@ a:hover {
 #notice-label.warning {
   color: #ffff00;
   border-color: #ffff00;
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 255, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(255, 255, 0, 0.3),
     0 0 8px rgba(255, 255, 0, 0.5);
   text-shadow: 0 0 3px rgba(255, 255, 0, 0.7);
 }
@@ -163,7 +181,9 @@ a:hover {
 #notice-label.error {
   color: #ff0000;
   border-color: #ff0000;
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
   text-shadow: 0 0 3px rgba(255, 0, 0, 0.7);
 }
@@ -174,12 +194,16 @@ a:hover {
 
 @keyframes glow {
   from {
-    box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 200, 255, 0.3),
+    box-shadow:
+      0 0 0 1px #000022,
+      inset 0 0 5px rgba(0, 200, 255, 0.3),
       0 0 8px rgba(0, 200, 255, 0.5);
     text-shadow: 0 0 5px rgba(0, 200, 255, 0.7);
   }
   to {
-    box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(0, 200, 255, 0.5),
+    box-shadow:
+      0 0 0 1px #000022,
+      inset 0 0 10px rgba(0, 200, 255, 0.5),
       0 0 15px rgba(0, 200, 255, 0.7);
     text-shadow: 0 0 10px rgba(0, 200, 255, 0.9);
   }

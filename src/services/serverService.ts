@@ -6,7 +6,7 @@ import {
   writeTextFile,
 } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
-import packageInfo from "../../package.json";
+import packageInfo from "../../package.json" with { type: "json" };
 
 interface ApiResponse {
   data: ServerInfo[];

@@ -1,12 +1,11 @@
-# Goonstation Launcher - GitHub Copilot Context
+# Goonstation Launcher
 
-## Project Overview
-
-Goonstation Launcher is a Windows Rust application that displays server status information for goonhub.com servers. The application provides a simple interface for checking server status and eventually launching the game to connect to selected servers.
+Goonstation Launcher is a Windows application that displays server status
+information for Goonstation Space Station 13 servers. There's a simple interface
+for checking server status and launching the game to connect to a server.
 
 1. **GUI Interface**
-
-   - Servers status display, including:
+   - Server status display, including:
      - Server name
      - Player count
      - Server status (online/offline)
@@ -16,6 +15,6 @@ Goonstation Launcher is a Windows Rust application that displays server status i
 
 2. **HTTP Request Handling**
    - Background threads for network operations
-   - Refresh happening in the background every 10 seconds
+   - Refresh happening in the background
    - Error handling for connection issues
    - Caching server status information, using it if needed

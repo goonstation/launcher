@@ -10,14 +10,14 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.5.0",
-    "@tauri-apps/plugin-fs": "^2.3.0",
-    "@tauri-apps/plugin-opener": "^2.2.7",
-    "@tauri-apps/plugin-http": "^2.4.4"
+    "@tauri-apps/api": "^2.5",
+    "@tauri-apps/plugin-fs": "^2.3",
+    "@tauri-apps/plugin-opener": "^2.2",
+    "@tauri-apps/plugin-http": "^2.4"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "vite": "^6.0.3",
-    "typescript": "~5.8.3"
+    "vite": "^6.3",
+    "typescript": "^5.8"
   }
 }

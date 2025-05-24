@@ -1,12 +1,12 @@
 // UI service for managing interface elements
 
-import { joinServer } from "./serverJoinService";
+import { joinServer } from "./serverJoinService.ts";
 import {
-  ServerDataState,
-  ServerInfo,
   getSortedServers,
   isServerOnline,
-} from "./serverService";
+  ServerDataState,
+  ServerInfo,
+} from "./serverService.ts";
 
 // DOM Elements
 let serverButtonsContainer: HTMLElement;
@@ -63,8 +63,8 @@ export function updateStatusNotice(
       break;
 
     case ServerDataState.ERROR:
-      noticeLabel.textContent =
-        errorMessage || "❌ error updating servers - please try again";
+      noticeLabel.textContent = errorMessage ||
+        "❌ error updating servers - please try again";
       noticeLabel.classList.add("error");
       break;
   }

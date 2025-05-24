@@ -1,7 +1,11 @@
 // Settings UI service for managing settings interface
 
-import { LaunchMethod, getSettings, updateSettings } from "./settingsService";
-import { setNoticeMessage } from "./uiService";
+import {
+  getSettings,
+  LaunchMethod,
+  updateSettings,
+} from "./settingsService.ts";
+import { setNoticeMessage } from "./uiService.ts";
 
 let noticeLabel: HTMLElement;
 
@@ -59,10 +63,12 @@ async function handleSettingsSubmit(event: Event) {
   event.preventDefault();
 
   // Get form elements
-  const byondPathInput =
-    document.querySelector<HTMLInputElement>("#byond-path");
-  const launchMethodSelect =
-    document.querySelector<HTMLSelectElement>("#byond-mode");
+  const byondPathInput = document.querySelector<HTMLInputElement>(
+    "#byond-path",
+  );
+  const launchMethodSelect = document.querySelector<HTMLSelectElement>(
+    "#byond-mode",
+  );
 
   // Validate inputs exist
   if (!byondPathInput || !launchMethodSelect) {
@@ -104,10 +110,12 @@ async function loadSettingsIntoForm() {
     const settings = await getSettings();
 
     // Get form elements
-    const byondPathInput =
-      document.querySelector<HTMLInputElement>("#byond-path");
-    const launchMethodSelect =
-      document.querySelector<HTMLSelectElement>("#byond-mode");
+    const byondPathInput = document.querySelector<HTMLInputElement>(
+      "#byond-path",
+    );
+    const launchMethodSelect = document.querySelector<HTMLSelectElement>(
+      "#byond-mode",
+    );
 
     // Update form values
     if (byondPathInput) {

@@ -1,7 +1,7 @@
 // Server join service for handling connection to servers
 
-import { ServerInfo } from "./serverService";
-import { getSettings } from "./settingsService";
+import { ServerInfo } from "./serverService.ts";
+import { getSettings } from "./settingsService.ts";
 
 /**
  * Join a server using the configured BYOND settings
@@ -22,9 +22,11 @@ export async function joinServer(
     console.log(`Server link: ${server.byond_link}`);
 
     // For now, just show a message
-    noticeElement.textContent = `🚀 Joining ${server.short_name} via ${settings.launchMethod}`;
+    noticeElement.textContent =
+      `🚀 Joining ${server.short_name} via ${settings.launchMethod}`;
     setTimeout(() => {
-      noticeElement.textContent = `✅ Started ${settings.launchMethod} for ${server.short_name}`;
+      noticeElement.textContent =
+        `✅ Started ${settings.launchMethod} for ${server.short_name}`;
     }, 2000);
   } catch (error) {
     console.error("Error joining server:", error);

@@ -5,10 +5,10 @@
     "npm:@tauri-apps/api@^2.5.0": "2.5.0",
     "npm:@tauri-apps/cli@2": "2.5.0",
     "npm:@tauri-apps/plugin-fs@^2.3.0": "2.3.0",
-    "npm:@tauri-apps/plugin-http@^2.4.4": "2.4.4",
-    "npm:@tauri-apps/plugin-opener@^2.2.7": "2.2.7",
-    "npm:typescript@~5.8.3": "5.8.3",
-    "npm:vite@^6.0.3": "6.3.5_picomatch@4.0.2"
+    "npm:@tauri-apps/plugin-http@^2.4.0": "2.4.4",
+    "npm:@tauri-apps/plugin-opener@^2.2.0": "2.2.7",
+    "npm:typescript@^5.8.0": "5.8.3",
+    "npm:vite@^6.3.0": "6.3.5_picomatch@4.0.2"
   },
   "npm": {
     "@esbuild/aix-ppc64@0.25.4": {
@@ -462,10 +462,10 @@
         "npm:@tauri-apps/api@^2.5.0",
         "npm:@tauri-apps/cli@2",
         "npm:@tauri-apps/plugin-fs@^2.3.0",
-        "npm:@tauri-apps/plugin-http@^2.4.4",
-        "npm:@tauri-apps/plugin-opener@^2.2.7",
-        "npm:typescript@~5.8.3",
-        "npm:vite@^6.0.3"
+        "npm:@tauri-apps/plugin-http@^2.4.0",
+        "npm:@tauri-apps/plugin-opener@^2.2.0",
+        "npm:typescript@^5.8.0",
+        "npm:vite@^6.3.0"
       ]
     }
   }
