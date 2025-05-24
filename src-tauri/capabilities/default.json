@@ -12,6 +12,7 @@
     },
     "opener:default",
     "fs:default",
-    "fs:allow-appcache-write"
+    "fs:allow-appcache-write",
+    "fs:allow-appdata-write"
   ]
 }

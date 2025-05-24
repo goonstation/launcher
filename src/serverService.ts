@@ -50,6 +50,7 @@ export interface ServerInfo {
   created_at: string;
   updated_at: string;
   byond_link?: string;
+  player_count?: number;
 }
 
 /**
