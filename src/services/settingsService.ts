@@ -1,9 +1,9 @@
 import { appDataDir } from "@tauri-apps/api/path";
 import {
-  readTextFile,
-  writeTextFile,
   exists,
   mkdir,
+  readTextFile,
+  writeTextFile,
 } from "@tauri-apps/plugin-fs";
 
 export enum LaunchMethod {
@@ -32,7 +32,7 @@ export async function getSettings(): Promise<UserSettings> {
 }
 
 export async function updateSettings(
-  settings: Partial<UserSettings>
+  settings: Partial<UserSettings>,
 ): Promise<boolean> {
   const current = await getSettings();
   const updatedSettings = { ...current, ...settings };
@@ -42,7 +42,7 @@ export async function updateSettings(
     document.dispatchEvent(
       new CustomEvent("settings-update", {
         detail: { settings: updatedSettings },
-      })
+      }),
     );
   }
   return result;

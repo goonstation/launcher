@@ -1,12 +1,12 @@
-import { fetch } from "@tauri-apps/plugin-http";
 import { appCacheDir } from "@tauri-apps/api/path";
-import packageInfo from "../package.json";
 import {
-  readTextFile,
-  writeTextFile,
   exists,
   mkdir,
+  readTextFile,
+  writeTextFile,
 } from "@tauri-apps/plugin-fs";
+import { fetch } from "@tauri-apps/plugin-http";
+import packageInfo from "../../package.json";
 
 interface ApiResponse {
   data: ServerInfo[];
@@ -56,6 +56,8 @@ export enum ServerDataState {
 }
 
 let currentState = ServerDataState.LOADING;
+let refreshInterval: number | null = null;
+const REFRESH_INTERVAL_MS = 30_000; // 30 seconds
 
 /**
  * Get current server data state
@@ -65,12 +67,47 @@ export function getServerDataState(): ServerDataState {
 }
 
 /**
+ * Start the background refresh for server status
+ */
+export function startServerStatusRefresh() {
+  // Clear any existing interval
+  if (refreshInterval !== null) {
+    clearInterval(refreshInterval);
+  }
+
+  // Initial fetch
+  fetchServerStatus().catch(console.error);
+
+  // Set up regular background refresh
+  refreshInterval = setInterval(() => {
+    // Don't auto-refresh if we're already in loading/refreshing state
+    const currentState = getServerDataState();
+    if (
+      currentState !== ServerDataState.LOADING &&
+      currentState !== ServerDataState.REFRESHING
+    ) {
+      fetchServerStatus().catch(console.error);
+    }
+  }, REFRESH_INTERVAL_MS);
+}
+
+/**
+ * Stop the background refresh for server status
+ */
+export function stopServerStatusRefresh() {
+  if (refreshInterval !== null) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+}
+
+/**
  * Dispatch a server status event with data
  */
 function dispatchServerEvent(
   state: ServerDataState,
   servers: ServerInfo[] = [],
-  error: Error | null = null
+  error: Error | null = null,
 ) {
   currentState = state;
 
@@ -82,7 +119,7 @@ function dispatchServerEvent(
         servers,
         error: error?.message || null,
       },
-    })
+    }),
   );
 }
 
@@ -154,7 +191,7 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
         dispatchServerEvent(
           ServerDataState.LOADED_CACHE,
           cachedData || [],
-          error
+          error,
         );
       });
 
@@ -181,7 +218,7 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
       dispatchServerEvent(
         ServerDataState.ERROR,
         [],
-        new Error("Unknown error fetching server data")
+        new Error("Unknown error fetching server data"),
       );
     }
 
