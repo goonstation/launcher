@@ -8,9 +8,6 @@ import {
   mkdir,
 } from "@tauri-apps/plugin-fs";
 
-/**
- * Interface for the API response
- */
 interface ApiResponse {
   data: ServerInfo[];
   links: {
@@ -35,9 +32,6 @@ interface ApiResponse {
   };
 }
 
-/**
- * Interface for server info from the API
- */
 export interface ServerInfo {
   id: number;
   server_id: string;
@@ -53,9 +47,6 @@ export interface ServerInfo {
   player_count?: number;
 }
 
-/**
- * Server data state enum
- */
 export enum ServerDataState {
   LOADING = "loading",
   LOADED_FRESH = "loaded_fresh",
@@ -64,7 +55,6 @@ export enum ServerDataState {
   ERROR = "error",
 }
 
-// Current data state
 let currentState = ServerDataState.LOADING;
 
 /**
@@ -82,7 +72,6 @@ function dispatchServerEvent(
   servers: ServerInfo[] = [],
   error: Error | null = null
 ) {
-  // Update internal state
   currentState = state;
 
   // Dispatch event to notify the UI
@@ -145,11 +134,7 @@ async function loadCachedServerData(): Promise<ServerInfo[] | null> {
   }
 }
 
-/**
- * Fetch server status information
- */
 export async function fetchServerStatus(): Promise<ServerInfo[]> {
-  // Set loading state immediately
   dispatchServerEvent(ServerDataState.LOADING);
 
   // Try to load cached data first
@@ -158,10 +143,8 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
     cachedData = await loadCachedServerData();
 
     if (cachedData) {
-      // Dispatch cached data event
       dispatchServerEvent(ServerDataState.LOADED_CACHE, cachedData);
 
-      // Change to refreshing state
       dispatchServerEvent(ServerDataState.REFRESHING, cachedData);
 
       // Start fetch in background
@@ -172,15 +155,13 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
           ServerDataState.LOADED_CACHE,
           cachedData || [],
           error
-        ); // Fix: use empty array if cachedData is null
+        );
       });
 
-      // Return cached data immediately
       return cachedData;
     }
   } catch (cachedError) {
     console.error("Error loading cached data:", cachedError);
-    // Continue to fetch fresh data
   }
 
   // If no cached data or error loading cache, fetch directly and wait

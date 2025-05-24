@@ -10,13 +10,13 @@ import {
 import { LaunchMethod, getSettings, updateSettings } from "./settingsService";
 
 // DOM Elements
-let backgroundMusic: HTMLAudioElement | null;
-let muteButton: HTMLButtonElement | null;
-let serverButtonsContainer: HTMLElement | null;
-let refreshButton: HTMLButtonElement | null;
-let exitButton: HTMLButtonElement | null;
-let noticeLabel: HTMLElement | null;
-let settingsButton: HTMLButtonElement | null;
+let backgroundMusic: HTMLAudioElement;
+let muteButton: HTMLButtonElement;
+let serverButtonsContainer: HTMLElement;
+let refreshButton: HTMLButtonElement;
+let exitButton: HTMLButtonElement;
+let noticeLabel: HTMLElement;
+let settingsButton: HTMLButtonElement;
 
 // Audio state
 let isMuted = false;
@@ -25,19 +25,12 @@ let isMuted = false;
  * Initialize audio functionality
  */
 function initAudio() {
-  if (!backgroundMusic || !muteButton) return;
-
-  // Set initial volume
   backgroundMusic.volume = 0.5;
 
-  // Start playing the background music
   backgroundMusic.play().catch((error) => {
     console.error("Audio playback failed:", error);
-    noticeLabel!.textContent =
-      "Audio autoplay blocked by browser. Click the sound icon to play.";
   });
 
-  // Set up mute button click handler
   muteButton.addEventListener("click", toggleAudio);
 }
 
@@ -45,8 +38,6 @@ function initAudio() {
  * Toggle audio mute/unmute
  */
 function toggleAudio() {
-  if (!backgroundMusic || !muteButton || !noticeLabel) return;
-
   isMuted = !isMuted;
 
   if (isMuted) {
@@ -71,8 +62,6 @@ function updateStatusNotice(
   state: ServerDataState,
   errorMessage: string | null = null
 ) {
-  if (!noticeLabel || !refreshButton) return;
-
   // Enable the refresh button for all states except LOADING
   refreshButton.disabled = state === ServerDataState.LOADING;
 
@@ -110,19 +99,15 @@ function updateStatusNotice(
   }
 }
 
-/**
- * Initialize the application
- */
 function initApp() {
-  // Get references to DOM elements
-  backgroundMusic = document.querySelector("#background-music");
-  muteButton = document.querySelector("#mute-button");
-  serverButtonsContainer = document.querySelector("#server-buttons-container");
-  refreshButton = document.querySelector("#refresh-button");
-  exitButton = document.querySelector("#exit-button");
-  noticeLabel = document.querySelector("#notice-label");
-  settingsButton = document.querySelector("#settings-button");
-  // Initialize audio
+  backgroundMusic = document.querySelector("#background-music")!;
+  muteButton = document.querySelector("#mute-button")!;
+  serverButtonsContainer = document.querySelector("#server-buttons-container")!;
+  refreshButton = document.querySelector("#refresh-button")!;
+  exitButton = document.querySelector("#exit-button")!;
+  noticeLabel = document.querySelector("#notice-label")!;
+  settingsButton = document.querySelector("#settings-button")!;
+
   initAudio();
 
   // Initialize settings
@@ -131,35 +116,31 @@ function initApp() {
   });
 
   // Set up button event listeners
-  if (refreshButton) {
-    refreshButton.addEventListener("click", () => {
-      updateServerStatus();
-    });
-  }
+  refreshButton.addEventListener("click", () => {
+    updateServerStatus();
+  });
 
-  if (exitButton) {
-    exitButton.addEventListener("click", async () => {
-      if (noticeLabel) noticeLabel.textContent = "Exiting application...";
+  exitButton.addEventListener("click", async () => {
+    noticeLabel.textContent = "Exiting application...";
+    await getCurrentWindow().close();
+  });
 
-      await getCurrentWindow().close();
-    });
-  }
-  if (settingsButton) {
-    settingsButton.addEventListener("click", () => {
-      const modal = document.querySelector("#settings-modal");
-      if (modal) {
-        const isCurrentlyHidden = modal.classList.contains("hidden");
-        toggleSettingsModal(isCurrentlyHidden);
-      }
-    });
-  }
+  settingsButton.addEventListener("click", () => {
+    const modal = document.querySelector("#settings-modal");
+    if (modal) {
+      const isCurrentlyHidden = modal.classList.contains("hidden");
+      toggleSettingsModal(isCurrentlyHidden);
+    }
+  });
 
   const closeModalButton = document.querySelector("#close-modal-button");
   if (closeModalButton) {
     closeModalButton.addEventListener("click", () => {
       toggleSettingsModal(false);
     });
-  } // Set up settings form submission
+  }
+
+  // Set up settings form submission
   const settingsForm = document.querySelector("#settings-modal form");
   if (settingsForm) {
     settingsForm.addEventListener("submit", handleSettingsSubmit);
@@ -188,7 +169,7 @@ function initApp() {
     ) {
       fetchServerStatus().catch(console.error);
     }
-  }, 20_000);
+  }, 30_000);
   +(
     // Fetch server status initially
     updateServerStatus()
@@ -212,13 +193,11 @@ async function updateServerStatus() {
  * Create buttons for each server
  */
 function createServerButtons(servers: ServerInfo[]) {
-  if (!serverButtonsContainer) return;
-
   // Clear existing buttons
   serverButtonsContainer.innerHTML = "";
 
-  // Get sorted servers
   const sortedServers = getSortedServers(servers);
+
   // Create buttons for each server
   sortedServers.forEach((server) => {
     const button = document.createElement("button");
@@ -254,13 +233,11 @@ function createServerButtons(servers: ServerInfo[]) {
       if (serverOnline) {
         joinServer(server);
       } else {
-        if (noticeLabel) {
-          noticeLabel.textContent = `Server ${server.name} is currently offline.`;
-        }
+        noticeLabel.textContent = `${server.name} is currently offline.`;
       }
     });
 
-    serverButtonsContainer!.appendChild(button);
+    serverButtonsContainer.appendChild(button);
   });
 }
 
@@ -291,26 +268,22 @@ async function handleSettingsSubmit(event: Event) {
 
     if (success) {
       // Provide feedback
-      if (noticeLabel) {
-        noticeLabel.textContent = "✅ Settings saved successfully";
-        setTimeout(() => {
-          if (
-            noticeLabel &&
-            noticeLabel.textContent === "✅ Settings saved successfully"
-          ) {
-            noticeLabel.textContent = "";
-          }
-        }, 3000);
-      }
+      noticeLabel.textContent = "✅ Settings saved successfully";
+      setTimeout(() => {
+        if (
+          noticeLabel &&
+          noticeLabel.textContent === "✅ Settings saved successfully"
+        ) {
+          noticeLabel.textContent = "";
+        }
+      }, 3000);
 
       // Close the modal
       toggleSettingsModal(false);
     }
   } catch (error) {
     console.error("Error saving settings:", error);
-    if (noticeLabel) {
-      noticeLabel.textContent = "❌ Error saving settings";
-    }
+    noticeLabel.textContent = "❌ Error saving settings";
   }
 }
 
@@ -363,9 +336,7 @@ async function joinServer(server: ServerInfo) {
     const settings = await getSettings();
 
     // Display joining message
-    if (noticeLabel) {
-      noticeLabel.textContent = `Joining ${server.name}...`;
-    }
+    noticeLabel.textContent = `Joining ${server.name}...`;
 
     console.log(
       `Joining server using ${settings.launchMethod} at ${settings.byondPath}`
@@ -373,19 +344,13 @@ async function joinServer(server: ServerInfo) {
     console.log(`Server link: ${server.byond_link}`);
 
     // For now, just show a message
-    if (noticeLabel) {
-      noticeLabel.textContent = `🚀 Joining ${server.short_name} via ${settings.launchMethod}`;
-      setTimeout(() => {
-        if (noticeLabel) {
-          noticeLabel.textContent = `✅ Started ${settings.launchMethod} for ${server.short_name}`;
-        }
-      }, 2000);
-    }
+    noticeLabel.textContent = `🚀 Joining ${server.short_name} via ${settings.launchMethod}`;
+    setTimeout(() => {
+      noticeLabel.textContent = `✅ Started ${settings.launchMethod} for ${server.short_name}`;
+    }, 2000);
   } catch (error) {
     console.error("Error joining server:", error);
-    if (noticeLabel) {
-      noticeLabel.textContent = "❌ Error joining server";
-    }
+    noticeLabel.textContent = "❌ Error joining server";
   }
 }
 
