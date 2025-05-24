@@ -13,9 +13,6 @@ let serverButtonsContainer: HTMLElement;
 let refreshButton: HTMLButtonElement;
 let noticeLabel: HTMLElement;
 
-/**
- * Initialize UI elements
- */
 export function initUIService(
   buttonContainer: HTMLElement,
   refreshBtn: HTMLButtonElement,
@@ -26,15 +23,14 @@ export function initUIService(
   noticeLabel = noticeElement;
 }
 
-/**
- * Update the status notice based on server data state
- */
+/** Update the status notice based on server data state */
 export function updateStatusNotice(
   state: ServerDataState,
   errorMessage: string | null = null,
 ) {
-  // Enable the refresh button for all states except LOADING
-  refreshButton.disabled = state === ServerDataState.LOADING;
+  // No constant refreshing
+  refreshButton.disabled = state === ServerDataState.LOADING ||
+    state === ServerDataState.REFRESHING;
 
   // Remove all state classes
   noticeLabel.classList.remove("warning", "error", "refreshing");
@@ -70,9 +66,7 @@ export function updateStatusNotice(
   }
 }
 
-/**
- * Create buttons for each server
- */
+/** Create buttons for each server */
 export function createServerButtons(servers: ServerInfo[]) {
   // Clear existing buttons
   serverButtonsContainer.innerHTML = "";

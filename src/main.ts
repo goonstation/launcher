@@ -12,11 +12,7 @@ import {
   updateStatusNotice,
 } from "./services/uiService.ts";
 
-/**
- * Initialize the application
- */
 function initApp() {
-  // Get references to DOM elements
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
     "#background-music",
   )!;
@@ -71,16 +67,12 @@ function initApp() {
   startServerStatusRefresh();
 }
 
-/**
- * Update server status information manually
- */
+/** Update server status information manually */
 async function updateServerStatus() {
   try {
-    // This will trigger the server-status-update event
     await fetchServerStatus();
   } catch (error) {
     console.error("Error in updateServerStatus:", error);
-    // The event system will handle displaying the error
   }
 }
 
