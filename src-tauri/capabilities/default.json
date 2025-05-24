@@ -11,6 +11,14 @@
       "allow": [{ "url": "https://api.goonhub.com" }]
     },
     "opener:default",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "byond:*"
+        }
+      ]
+    },
     "fs:default",
     "fs:allow-appcache-write",
     "fs:allow-appdata-write"

@@ -18,3 +18,10 @@ for checking server status and launching the game to connect to a server.
    - Refresh happening in the background
    - Error handling for connection issues
    - Caching server status information, using it if needed
+
+Use single-line jsdoc comments unless they're multiline. For example,
+`/** foobar */`
+
+Don't rerun the `deno task tauri dev` every time, I'm running it in the
+background. We install using deno, for example
+`deno install npm:@tauri-apps/plugin-shell`

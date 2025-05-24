@@ -43,7 +43,6 @@ export interface ServerInfo {
   invisible: boolean;
   created_at: string;
   updated_at: string;
-  byond_link?: string;
   player_count?: number;
 }
 
@@ -251,10 +250,6 @@ async function fetchFreshData(): Promise<ServerInfo[]> {
 
     // Process server data
     const processedServers = servers.map((server) => {
-      // Generate byond_link if it doesn't exist
-      if (!server.byond_link) {
-        server.byond_link = `byond://${server.address}:${server.port}`;
-      }
       return server;
     });
 
