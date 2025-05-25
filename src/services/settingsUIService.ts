@@ -79,28 +79,17 @@ async function handleSettingsSubmit(event: Event) {
     });
 
     if (success) {
-      // Provide feedback
-      setNoticeMessage("✅ Settings saved successfully");
-      setTimeout(() => {
-        // Clear the message if it hasn't been changed
-        setNoticeMessage("");
-      }, 3000);
-
-      // Close the modal
+      setNoticeMessage("✅ settings saved successfully");
       toggleSettingsModal(false);
     }
   } catch (error) {
-    console.error("Error saving settings:", error);
-    setNoticeMessage("❌ Error saving settings", true);
+    console.error("error saving settings:", error);
+    setNoticeMessage("❌ error saving settings", true);
   }
 }
 
-/**
- * Load settings into the form
- */
 async function loadSettingsIntoForm() {
   try {
-    // Get current settings
     const settings = await getSettings();
 
     // Get form elements

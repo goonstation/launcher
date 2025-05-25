@@ -10,5 +10,8 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
   }
 }

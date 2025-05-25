@@ -11,13 +11,34 @@ body {
 }
 
 main {
-  padding-top: 5vh;
+  padding-top: 1vh;
   max-width: 50rem;
   margin: 0 auto;
+  clear: both;
 }
 
 .app-header {
-  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  float: left;
+}
+
+.icon-link {
+  margin-left: 1rem;
+}
+
+.icon-link:first-child {
+  margin-left: 0;
+}
+
+.icon-link:hover {
+  transform: scale(1.1);
+}
+
+.icon-link img {
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  image-rendering: pixelated;
 }
 
 .retro-frame {
@@ -52,10 +73,10 @@ main {
 }
 
 .config-button:hover {
-  background: linear-gradient(to bottom, #555, #222);
+  background: linear-gradient(to bottom, #666, #333);
 }
 
-.mute-button {
+#mute-button {
   right: 0.5rem;
 }
 
@@ -63,7 +84,7 @@ main {
   text-indent: -3.5px;
 }
 
-.settings-button {
+#settings-button {
   right: 3.5rem;
 }
 
@@ -78,36 +99,13 @@ main {
   justify-content: center;
 }
 
-a {
-  font-weight: 500;
-  color: var(--secondary-color);
-  text-decoration: inherit;
-  text-shadow: 0 0 5px var(--secondary-color);
-}
-
-a:hover {
-  color: var(--highlight-color);
-  text-shadow: 0 0 5px var(--highlight-color);
-}
-
 .styled {
   border-radius: 4px;
   border: 1px solid var(--button-border);
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
   font-family: "Courier New", monospace;
-  background: linear-gradient(
-    to bottom,
-    var(--button-gradient-start),
-    var(--button-gradient-end)
-  );
   transition: all 0.25s;
-  box-shadow:
-    0 0 0 1px #000066,
-    inset 0 0 5px rgba(0, 200, 255, 0.5),
-    0 0 8px rgba(0, 200, 255, 0.5);
-  text-shadow: 0 0 5px var(--text-color);
   outline: none;
   cursor: pointer;
   position: relative;
@@ -222,7 +220,7 @@ a:hover {
 
 .modal {
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 50%;
   font-family: "Tahoma", Courier, monospace;
   font-smooth: never;
@@ -264,9 +262,23 @@ a:hover {
   margin-bottom: 5px;
 }
 
+.modal input[type="text"],
+.modal select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 2px;
+  margin-bottom: 0.5rem;
+  border: 1px inset #8a8a8a;
+  font-family: "Tahoma", Courier, monospace;
+}
+
+#byond-path {
+  width: 100%;
+  font-size: 0.9rem;
+}
+
 #close-modal-button {
-  background: none;
-  color: #000;
+  color: black;
   background-color: #bfbfbf;
   border: 1px outset #8a8a8a;
   width: 1rem;
@@ -274,13 +286,13 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-
+  font-size: 1.4rem;
   cursor: pointer;
   padding: 0.5rem;
 }
 
 #close-modal-button:hover {
+  color: white;
   background-color: #c14040;
 }
 

@@ -10,7 +10,7 @@
 
   <body>
     <audio id="background-music" loop>
-      <source src="/src/assets/after_party.ogg" type="audio/ogg">
+      <source src="/src/assets/audio/after_party.ogg" type="audio/ogg">
       Your browser does not support the audio element.
     </audio>
 
@@ -26,16 +26,45 @@
     </button>
 
     <div class="app-header retro-frame">
-      <img src="/src/assets/goonstation.ico" alt="Goonstation icon" />
+      <a
+        class="icon-link"
+        href="https://goonhub.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Goonhub"
+      >
+        <img src="/src/assets/links/goonhub.png" alt="Goonhub" />
+      </a>
+      <a
+        class="icon-link"
+        href="https://discord.gg/zd8t6pY"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Discord"
+      >
+        <img src="/src/assets/links/discord.png" alt="Discord" />
+      </a>
+      <a
+        class="icon-link"
+        href="https://github.com/goonstation/goonstation"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="GitHub"
+      >
+        <img src="/src/assets/links/github.png" alt="GitHub" />
+      </a>
+      <a
+        class="icon-link"
+        href="https://wiki.ss13.co"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Wiki"
+      >
+        <img src="/src/assets/links/wiki.png" alt="Wiki" />
+      </a>
     </div>
 
     <main>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
       <div class="retro-frame">
         <div class="server-buttons" id="server-buttons-container">
           <!-- Server buttons will be inserted here dynamically -->
@@ -56,17 +85,16 @@
       </div>
 
       <form>
-        <button id="install-byond">Install BYOND</button>
-        <label for="byond-path">BYOND PATH:</label>
+        <label for="byond-path">BYOND Installation Path:</label>
         <input type="text" id="byond-path" />
         <label for="byond-mode">Launch Method:</label>
         <select id="byond-mode">
-          <option value="dreamseeker">DreamSeeker</option>
-          <option value="pager">BYOND Pager</option>
+          <option value="dreamseeker">
+            DreamSeeker (Guest/Goonhub Authentication)
+          </option>
+          <option value="pager">BYOND Pager (BYOND Authentication)</option>
         </select>
-        <br />
-        <br />
-        <button type="submit" id="settings-submit">Submit Changes</button>
+        <button type="submit" id="settings-submit">Save Settings</button>
       </form>
     </div>
   </body>
