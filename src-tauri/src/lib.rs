@@ -17,26 +17,31 @@ fn launch_dreamseeker(byond_path: &str, server_address: &str) -> Result<String, 
     path.push("bin");
     path.push("dreamseeker.exe");
 
-    println!("Launching DreamSeeker at: {:?} with address {}", path, server_address);
+    println!(
+        "Launching DreamSeeker at: {:?} with address {}",
+        path, server_address
+    );
 
     if !path.exists() {
-        return Err(format!("DreamSeeker executable not found at {}", path.display()));
+        return Err(format!(
+            "DreamSeeker executable not found at {}",
+            path.display()
+        ));
     }
 
     // Launch dreamseeker with the server address as argument
-    let result = Command::new(&path)
-        .arg(server_address)
-        .spawn();
+    let result = Command::new(&path).arg(server_address).spawn();
 
     match result {
         Ok(_) => Ok(format!("Started DreamSeeker for {}", server_address)),
-        Err(e) => Err(format!("Failed to launch DreamSeeker: {}", e))
+        Err(e) => Err(format!("Failed to launch DreamSeeker: {}", e)),
     }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
