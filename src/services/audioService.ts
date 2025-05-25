@@ -1,9 +1,10 @@
 // Audio service for managing background music
 
+import { setNoticeMessage } from "./uiService.ts";
+
 // DOM Elements
 let backgroundMusic: HTMLAudioElement;
 let muteButton: HTMLButtonElement;
-let noticeLabel: HTMLElement;
 
 // Audio state
 let isMuted = false;
@@ -11,12 +12,9 @@ let isMuted = false;
 export function initAudioService(
   musicElement: HTMLAudioElement,
   muteElement: HTMLButtonElement,
-  noticeLabelElement: HTMLElement,
 ) {
   backgroundMusic = musicElement;
   muteButton = muteElement;
-  noticeLabel = noticeLabelElement;
-
   initAudio();
 }
 
@@ -39,11 +37,11 @@ function toggleAudio() {
     backgroundMusic.pause();
     muteButton.textContent = "🔇";
     muteButton.classList.add("muted");
-    noticeLabel.textContent = "🔇 music muted :(";
+    setNoticeMessage("🔇 music muted :(");
   } else {
     backgroundMusic.play().catch(console.error);
     muteButton.textContent = "🔊";
     muteButton.classList.remove("muted");
-    noticeLabel.textContent = "🔊 music unmuted :)";
+    setNoticeMessage("🔊 music unmuted :)");
   }
 }

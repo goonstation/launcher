@@ -30,9 +30,9 @@ function initApp() {
   )!;
 
   // Initialize services
-  initAudioService(backgroundMusic, muteButton, noticeLabel);
+  initAudioService(backgroundMusic, muteButton);
   initUIService(serverButtonsContainer, refreshButton, noticeLabel);
-  initSettingsUIService(settingsButton, noticeLabel);
+  initSettingsUIService(settingsButton);
 
   // Initialize settings
   getSettings().catch((error) => {

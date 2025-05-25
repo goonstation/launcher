@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "goonstation-launcher",
+  "productName": "Goonstation Launcher",
   "version": "0.1.0",
-  "identifier": "com.goonstation-launcher.app",
+  "identifier": "com.goonstation.launcher",
   "build": {
     "beforeDevCommand": "deno task dev",
     "devUrl": "http://localhost:1420",
@@ -28,6 +28,19 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/goonstation.ico"]
+    "icon": ["icons/goonstation.ico"],
+    "windows": {
+      "allowDowngrades": true,
+      "nsis": {
+        "installMode": "both",
+        "headerImage": "icons/installBanner.bmp",
+        "sidebarImage": "icons/installSidebar.bmp",
+        "installerIcon": "icons/goonstation.ico"
+      },
+      "wix": {
+        "bannerPath": "icons/installBanner.bmp",
+        "upgradeCode": "debac1e5-5513-9002-fa11-901fd2e932ca"
+      }
+    }
   }
 }
