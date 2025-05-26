@@ -29,6 +29,9 @@
     "active": true,
     "targets": "all",
     "icon": ["icons/goonstation.ico"],
+    "publisher": "Goonstation",
+    "createUpdaterArtifacts": true,
+
     "windows": {
       "allowDowngrades": true,
       "nsis": {
@@ -40,6 +43,17 @@
       "wix": {
         "bannerPath": "icons/installBanner.bmp",
         "upgradeCode": "debac1e5-5513-9002-fa11-901fd2e932ca"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlEM0ExRkM3Rjc1RjczNDIKUldSQ2MxLzN4eDg2blc2Uk1wcHB4Z213TXQ1Y3N5UlkyeUVGbkpBa00xV1pQZU1mMzNObVBONk4K",
+      "endpoints": [
+        "https://github.com/goonstation/launcher/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }
