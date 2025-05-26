@@ -37,3 +37,11 @@ deno task tauri build
 deno fmt --check
 deno lint
 ```
+
+## Releasing
+
+Update the versions in:
+
+- package.json
+- cargo.toml
+- tauri.conf.json
