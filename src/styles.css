@@ -1,5 +1,6 @@
 @import "./theme.css";
 @import "./join-buttons.css";
+@import "./update-notification.css";
 
 body {
   min-height: 100vh;

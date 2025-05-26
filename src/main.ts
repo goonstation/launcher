@@ -11,6 +11,8 @@ import {
   initUIService,
   updateStatusNotice,
 } from "./services/uiService.ts";
+import { initUpdateUIService } from "./services/updateUIService.ts";
+import { initAutoUpdateCheck } from "./services/updateService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -33,11 +35,15 @@ function initApp() {
   initAudioService(backgroundMusic, muteButton);
   initUIService(serverButtonsContainer, refreshButton, noticeLabel);
   initSettingsUIService(settingsButton);
+  initUpdateUIService();
 
   // Initialize settings
   getSettings().catch((error) => {
     console.error("Error initializing settings:", error);
   });
+
+  // Initialize auto update check
+  initAutoUpdateCheck();
 
   // Set up button event listeners for refresh and exit
   refreshButton.addEventListener("click", updateServerStatus);
