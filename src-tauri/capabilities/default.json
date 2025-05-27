@@ -20,6 +20,8 @@
       ]
     },
     "fs:default",
+    "updater:default",
+    "process:default",
     "fs:allow-appcache-write",
     "fs:allow-appdata-write"
   ]

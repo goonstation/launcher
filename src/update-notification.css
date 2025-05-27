@@ -1,38 +1,32 @@
 .update-notification {
   position: fixed;
-  top: 1.5rem;
-  right: 5.5rem;
-  background: linear-gradient(to bottom, #0066cc, #003366);
-  border: 0.1rem solid #00ccff;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  max-width: 22%;
+  background: linear-gradient(to bottom, #006633, #003311);
+  border: 0.1rem solid var(--status-online);
   border-radius: 4px;
   padding: 0.8rem;
   box-shadow:
-    0 0 0 1px #000066,
-    inset 0 0 10px rgba(0, 200, 255, 0.3),
-    0 0 15px rgba(0, 200, 255, 0.5);
-  font-family: Consolas, "Courier New", monospace;
-  color: #ffffff;
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(0, 255, 0, 0.3),
+    0 0 8px rgba(0, 255, 0, 0.5);
+  color: white;
   z-index: 1000;
-  max-width: 220px;
-  animation: update-glow 1.5s infinite alternate;
+  animation: update-glow 1s infinite alternate;
   transition: all 0.3s ease-in-out;
-}
-
-.update-notification.hidden {
-  display: none;
 }
 
 .update-content {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 #update-text {
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   text-align: center;
-  text-shadow: 0 0 5px rgba(0, 200, 255, 0.9);
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.9);
 }
 
 .update-buttons {
@@ -40,30 +34,31 @@
   gap: 0.5rem;
 }
 
-.update-button {
+.update-buttons button {
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
-  border-radius: 4px;
-  border: 1px solid var(--button-border);
-  background: linear-gradient(to bottom, #222, #111);
+  border-radius: 0.3rem;
+  background: linear-gradient(to bottom, #555, #151515);
   color: white;
-  cursor: pointer;
-  font-family: Consolas, "Courier New", monospace;
 }
 
 .update-button:hover {
-  background: linear-gradient(to bottom, #333, #222);
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(0, 200, 255, 0.3),
-    0 0 8px rgba(0, 200, 255, 0.5);
+  background: linear-gradient(to bottom, #666, #333);
+}
+
+#update-now-button {
+  border: 1px solid var(--button-border);
+}
+
+#update-later-button {
+  border: 1px solid var(--status-offline);
 }
 
 .update-progress {
   width: 100%;
   height: 0.5rem;
   background-color: #111;
-  border: 1px solid #00ccff;
+  border: 1px solid var(--status-online);
   border-radius: 3px;
   margin-top: 0.5rem;
   overflow: hidden;
@@ -79,14 +74,16 @@
 @keyframes update-glow {
   from {
     box-shadow:
-      0 0 0 1px #000066,
-      inset 0 0 5px rgba(0, 200, 255, 0.3),
-      0 0 8px rgba(0, 200, 255, 0.5);
+      0 0 0 1px #000022,
+      inset 0 0 5px rgba(0, 255, 0, 0.3),
+      0 0 8px rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
   }
   to {
     box-shadow:
-      0 0 0 1px #000066,
-      inset 0 0 10px rgba(0, 200, 255, 0.5),
-      0 0 15px rgba(0, 200, 255, 0.7);
+      0 0 0 1px #000022,
+      inset 0 0 10px rgba(0, 255, 0, 0.5),
+      0 0 15px rgba(0, 255, 0, 0.7);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.9);
   }
 }

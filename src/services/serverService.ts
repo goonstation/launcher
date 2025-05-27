@@ -235,7 +235,7 @@ async function fetchFreshData(): Promise<ServerInfo[]> {
     const response = await fetch("https://api.goonhub.com/servers", {
       method: "GET",
       headers: {
-        UserAgent: `GoonstationLauncher/${packageInfo.version}`,
+        "User-Agent": `GoonstationLauncher/${packageInfo.version}`,
       },
       connectTimeout: 5_000, // 5 seconds
     });
@@ -279,11 +279,13 @@ export function isServerOnline(server: ServerInfo): boolean {
  * Sort servers by visibility and ID
  */
 export function getSortedServers(servers: ServerInfo[]): ServerInfo[] {
-  // Sort servers: non-invisible first, then by ID
+  // Remove invisible servers
   const visibleServers = servers.filter((s) => s.invisible !== true);
+  // Remove inactive servers
+  const activeServers = visibleServers.filter((s) => s.active === true);
 
   // Sort both arrays by ID
-  const sortedVisibleServers = visibleServers.sort((a, b) => a.id - b.id);
+  const sortedVisibleServers = activeServers.sort((a, b) => a.id - b.id);
 
   // Combine both arrays, with visible servers first
   return sortedVisibleServers;

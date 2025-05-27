@@ -27,13 +27,6 @@ export function initUpdateUIService() {
     "update-later-button",
   ) as HTMLButtonElement;
 
-  if (
-    !updateNotification || !updateText || !updateNowButton || !updateLaterButton
-  ) {
-    console.error("Update UI elements not found in the DOM");
-    return;
-  }
-
   // Set up event listeners for update buttons
   updateNowButton.addEventListener("click", () => {
     updateText.textContent = "Downloading update...";
@@ -79,7 +72,7 @@ export function initUpdateUIService() {
 function handleUpdateStatusChange(progress: UpdateProgress): void {
   switch (progress.state) {
     case UpdateState.AVAILABLE:
-      showUpdateNotification(progress.version);
+      showUpdateNotification(progress.version || "imcoder");
       break;
 
     case UpdateState.DOWNLOADING:
@@ -96,18 +89,11 @@ function handleUpdateStatusChange(progress: UpdateProgress): void {
   }
 }
 
-/** Show the update notification with version information */
-function showUpdateNotification(version?: string): void {
-  if (version) {
-    updateText.textContent = `Update v${version} Available!`;
-  } else {
-    updateText.textContent = "Update Available!";
-  }
-
+function showUpdateNotification(version: string): void {
+  updateText.textContent = `Launcher Update Available: v${version}`;
   updateNotification.classList.remove("hidden");
 }
 
-/** Hide the update notification */
 function hideUpdateNotification(): void {
   updateNotification.classList.add("hidden");
 }

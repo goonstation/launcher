@@ -1,5 +1,6 @@
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
+import packageInfo from "../../package.json" with { type: "json" };
 
 /** Update status event name */
 export const UPDATE_STATUS_EVENT = "update-status";
@@ -34,18 +35,19 @@ function dispatchUpdateStatus(progress: UpdateProgress) {
 }
 
 /** Check for available updates */
-export async function checkForUpdates(silent = false): Promise<boolean> {
+export async function checkForUpdates(): Promise<boolean> {
   try {
-    if (!silent) {
-      dispatchUpdateStatus({ state: UpdateState.CHECKING });
-    }
+    dispatchUpdateStatus({ state: UpdateState.CHECKING });
 
-    const update = await check();
+    const update = await check({
+      timeout: 10_000,
+      headers: {
+        "User-Agent": `GoonstationLauncher/${packageInfo.version}`,
+      },
+    });
 
     if (!update) {
-      if (!silent) {
-        dispatchUpdateStatus({ state: UpdateState.UP_TO_DATE });
-      }
+      dispatchUpdateStatus({ state: UpdateState.UP_TO_DATE });
       return false;
     }
 
@@ -58,12 +60,10 @@ export async function checkForUpdates(silent = false): Promise<boolean> {
     return true;
   } catch (error) {
     console.error("Error checking for updates:", error);
-    if (!silent) {
-      dispatchUpdateStatus({
-        state: UpdateState.ERROR,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
+    dispatchUpdateStatus({
+      state: UpdateState.ERROR,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return false;
   }
 }
@@ -71,7 +71,12 @@ export async function checkForUpdates(silent = false): Promise<boolean> {
 /** Download and install available update */
 export async function downloadAndInstallUpdate(): Promise<void> {
   try {
-    const update = await check();
+    const update = await check({
+      timeout: 10_000,
+      headers: {
+        "User-Agent": `GoonstationLauncher/${packageInfo.version}`,
+      },
+    });
     if (!update) {
       return;
     }
@@ -119,9 +124,10 @@ export async function downloadAndInstallUpdate(): Promise<void> {
 
 /** Start the automatic update check on application startup */
 export function initAutoUpdateCheck(): void {
-  // Check for updates silently on startup
+  // Check for updates on startup
   setTimeout(() => {
-    checkForUpdates(true).then((updateAvailable) => {
+    console.log("Checking for updates on startup...");
+    checkForUpdates().then((updateAvailable) => {
       if (updateAvailable) {
         console.log("Update available, notifying user");
         // The update event will be handled by the UI listeners

@@ -7,7 +7,7 @@
     "npm:@tauri-apps/plugin-fs@^2.3.0": "2.3.0",
     "npm:@tauri-apps/plugin-http@^2.4.0": "2.4.4",
     "npm:@tauri-apps/plugin-opener@^2.2.0": "2.2.7",
-    "npm:@tauri-apps/plugin-process@^2.2.1": "2.2.1",
+    "npm:@tauri-apps/plugin-process@^2.2.0": "2.2.1",
     "npm:@tauri-apps/plugin-updater@^2.7.0": "2.7.1",
     "npm:typescript@^5.8.0": "5.8.3",
     "npm:vite@^6.3.0": "6.3.5_picomatch@4.0.2"
@@ -478,7 +478,7 @@
         "npm:@tauri-apps/plugin-fs@^2.3.0",
         "npm:@tauri-apps/plugin-http@^2.4.0",
         "npm:@tauri-apps/plugin-opener@^2.2.0",
-        "npm:@tauri-apps/plugin-process@^2.2.1",
+        "npm:@tauri-apps/plugin-process@^2.2.0",
         "npm:@tauri-apps/plugin-updater@^2.7.0",
         "npm:typescript@^5.8.0",
         "npm:vite@^6.3.0"
