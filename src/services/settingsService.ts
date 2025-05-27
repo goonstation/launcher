@@ -14,11 +14,13 @@ export enum LaunchMethod {
 export interface UserSettings {
   byondPath: string;
   launchMethod: LaunchMethod;
+  isMuted: boolean;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
   byondPath: "C:\\Program Files (x86)\\BYOND",
   launchMethod: LaunchMethod.DREAM_SEEKER,
+  isMuted: false,
 };
 const SETTINGS_FILENAME = "user_settings.json";
 
