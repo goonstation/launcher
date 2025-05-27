@@ -197,7 +197,7 @@ button {
   position: absolute;
   top: 50%;
   right: 0;
-  transform: translateY(-50%) scale(10);
+  transform: translateY(-50%) scale(11);
   z-index: -1;
   opacity: 0.2;
   pointer-events: none;

@@ -16,6 +16,7 @@
         "title": "Goonstation Launcher",
         "width": 700,
         "height": 560,
+        "visible": false,
         "resizable": true,
         "center": true,
         "backgroundColor": "#000033"

@@ -31,6 +31,8 @@ function initApp() {
     "#settings-button",
   )!;
 
+  getCurrentWindow().show();
+
   // Initialize services
   initAudioService(backgroundMusic, muteButton);
   initUIService(serverButtonsContainer, refreshButton, noticeLabel);
