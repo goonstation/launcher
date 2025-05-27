@@ -1,7 +1,6 @@
 // Update UI service for managing update notification interface
 
 import {
-  checkForUpdates,
   downloadAndInstallUpdate,
   UPDATE_STATUS_EVENT,
   UpdateProgress,
@@ -51,7 +50,6 @@ export function initUpdateUIService() {
       progressContainer,
     );
 
-    // Start the download and installation
     downloadAndInstallUpdate();
   });
 
@@ -137,33 +135,4 @@ function showUpdateError(errorMessage?: string): void {
       closeButton.addEventListener("click", hideUpdateNotification);
     }
   }
-}
-
-/** Manually check for updates */
-export function manuallyCheckForUpdates(): void {
-  updateText.textContent = "Checking for updates...";
-  updateNotification.classList.remove("hidden");
-
-  checkForUpdates().then((hasUpdate) => {
-    if (!hasUpdate) {
-      updateText.textContent = "You have the latest version!";
-
-      // Replace with a close button
-      const buttonsContainer = document.querySelector(".update-buttons");
-      if (buttonsContainer) {
-        buttonsContainer.innerHTML =
-          '<button id="update-close-button" class="update-button">Close</button>';
-
-        const closeButton = document.getElementById("update-close-button");
-        if (closeButton) {
-          closeButton.addEventListener("click", hideUpdateNotification);
-        }
-      }
-
-      // Auto-hide after 3 seconds
-      setTimeout(() => {
-        hideUpdateNotification();
-      }, 3000);
-    }
-  });
 }

@@ -12,7 +12,7 @@ import {
   updateStatusNotice,
 } from "./services/uiService.ts";
 import { initUpdateUIService } from "./services/updateUIService.ts";
-import { initAutoUpdateCheck } from "./services/updateService.ts";
+import { startupUpdateCheck } from "./services/updateService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -43,7 +43,7 @@ function initApp() {
   });
 
   // Initialize auto update check
-  initAutoUpdateCheck();
+  startupUpdateCheck();
 
   // Set up button event listeners for refresh and exit
   refreshButton.addEventListener("click", updateServerStatus);
@@ -83,4 +83,9 @@ async function updateServerStatus() {
 }
 
 // Initialize the app when DOM content is loaded
-globalThis.addEventListener("DOMContentLoaded", initApp);
+document.addEventListener("DOMContentLoaded", () => {
+  initApp();
+
+  // Prevent right-click context menu
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+});

@@ -26,6 +26,13 @@ export interface UpdateProgress {
   error?: string;
 }
 
+/** Start the automatic update check on application startup */
+export function startupUpdateCheck(): void {
+  setTimeout(() => {
+    checkForUpdates();
+  }, 2_000); // Wait before checking to let the app finish loading
+}
+
 /** Dispatch an update status event with the current progress */
 function dispatchUpdateStatus(progress: UpdateProgress) {
   const event = new CustomEvent(UPDATE_STATUS_EVENT, {
@@ -35,7 +42,7 @@ function dispatchUpdateStatus(progress: UpdateProgress) {
 }
 
 /** Check for available updates */
-export async function checkForUpdates(): Promise<boolean> {
+async function checkForUpdates(): Promise<boolean> {
   try {
     dispatchUpdateStatus({ state: UpdateState.CHECKING });
 
@@ -72,7 +79,7 @@ export async function checkForUpdates(): Promise<boolean> {
 export async function downloadAndInstallUpdate(): Promise<void> {
   try {
     const update = await check({
-      timeout: 10_000,
+      timeout: 5_000,
       headers: {
         "User-Agent": `GoonstationLauncher/${packageInfo.version}`,
       },
@@ -120,18 +127,4 @@ export async function downloadAndInstallUpdate(): Promise<void> {
       error: error instanceof Error ? error.message : String(error),
     });
   }
-}
-
-/** Start the automatic update check on application startup */
-export function initAutoUpdateCheck(): void {
-  // Check for updates on startup
-  setTimeout(() => {
-    console.log("Checking for updates on startup...");
-    checkForUpdates().then((updateAvailable) => {
-      if (updateAvailable) {
-        console.log("Update available, notifying user");
-        // The update event will be handled by the UI listeners
-      }
-    });
-  }, 2000); // Wait 2 seconds before checking to let the app finish loading
 }
