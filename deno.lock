@@ -9,6 +9,7 @@
     "npm:@tauri-apps/plugin-opener@^2.2.0": "2.2.7",
     "npm:@tauri-apps/plugin-process@^2.2.0": "2.2.1",
     "npm:@tauri-apps/plugin-updater@^2.7.0": "2.7.1",
+    "npm:tauri-plugin-drpc@^1.0.3": "1.0.3_typescript@5.8.3",
     "npm:typescript@^5.8.0": "5.8.3",
     "npm:vite@^6.3.0": "6.3.5_picomatch@4.0.2"
   },
@@ -443,6 +444,12 @@
     "source-map-js@1.2.1": {
       "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="
     },
+    "tauri-plugin-drpc@1.0.3_typescript@5.8.3": {
+      "integrity": "sha512-vl5dXhjKbl7+Nf9veW12usdmIUtZXwEf91SzxQPZlbRRJ/sjizbbQlnkUTtx6baJuGzz0KXXgP9xUhF39BdiXQ==",
+      "dependencies": [
+        "typescript"
+      ]
+    },
     "tinyglobby@0.2.13_picomatch@4.0.2": {
       "integrity": "sha512-mEwzpUgrLySlveBwEVDMKk5B57bhLPYovRfPAXD5gA/98Opn0rCDj3GtLwFvCvH5RK9uPCExUROW5NjDwvqkxw==",
       "dependencies": [
@@ -480,6 +487,7 @@
         "npm:@tauri-apps/plugin-opener@^2.2.0",
         "npm:@tauri-apps/plugin-process@^2.2.0",
         "npm:@tauri-apps/plugin-updater@^2.7.0",
+        "npm:tauri-plugin-drpc@^1.0.3",
         "npm:typescript@^5.8.0",
         "npm:vite@^6.3.0"
       ]

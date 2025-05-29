@@ -5,6 +5,10 @@ import { invoke } from "@tauri-apps/api/core";
 import { ServerInfo } from "./serverService.ts";
 import { getSettings, LaunchMethod } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
+import {
+  setInGameActivity,
+  setLauncherActivity,
+} from "./discordRichPresenceService.ts";
 
 /** Join a server using the configured BYOND settings */
 export async function joinServer(
@@ -26,6 +30,7 @@ export async function joinServer(
     if (settings.launchMethod === LaunchMethod.BYOND_PAGER) {
       await openUrl(byondUrl);
       setNoticeMessage(`✅ Opened ${server.short_name} in BYOND pager`);
+      await setInGameActivity(server.name);
     } else if (settings.launchMethod === LaunchMethod.DREAM_SEEKER) {
       // Launch DreamSeeker directly with the server address using Rust function
       try {
@@ -41,6 +46,13 @@ export async function joinServer(
 
         console.log("DreamSeeker launch result:", result);
         setNoticeMessage(`✅ Started DreamSeeker for ${server.short_name}`);
+        await setInGameActivity(server.short_name);
+
+        // Simulate DreamSeeker closing after some time for demonstration
+        setTimeout(async () => {
+          console.log("DreamSeeker instance closed.");
+          await setLauncherActivity();
+        }, 30000); // Replace with actual DreamSeeker close detection logic
       } catch (execError) {
         console.error("Error launching DreamSeeker:", execError);
         setNoticeMessage(
