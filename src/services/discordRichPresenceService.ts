@@ -1,15 +1,12 @@
-import { destroy, setActivity, start } from "tauri-plugin-drpc";
-import { Activity, ActivityType, Timestamps } from "tauri-plugin-drpc/activity";
+import { invoke } from "@tauri-apps/api/core";
 
-const APPLICATION_ID = "1377501813862961244";
-
-let currentActivity: Activity | undefined = undefined;
-
+/**
+ * Initializes Discord Rich Presence when the launcher is open.
+ */
 export async function initDiscordRichPresence() {
   try {
-    await start(APPLICATION_ID);
+    await invoke("init_discord_rpc");
     console.log("Discord Rich Presence started.");
-    setLauncherActivity();
   } catch (err) {
     console.error("Failed to start Discord Rich Presence:", err);
   }
@@ -20,13 +17,7 @@ export async function initDiscordRichPresence() {
  */
 export async function setLauncherActivity() {
   try {
-    const launcherStartTime = new Timestamps(Date.now());
-    currentActivity = new Activity()
-      .setActivity(ActivityType.Playing)
-      .setState("In Launcher")
-      .setDetails("Browsing servers")
-      .setTimestamps(launcherStartTime);
-    await setActivity(currentActivity);
+    await invoke("set_launcher_activity");
     console.log("Discord Rich Presence activity set to 'In Launcher'.");
   } catch (err) {
     console.error("Failed to set launcher activity:", err);
@@ -39,13 +30,7 @@ export async function setLauncherActivity() {
  */
 export async function setInGameActivity(serverName: string) {
   try {
-    const gameStartTime = new Timestamps(Date.now());
-    currentActivity = new Activity()
-      .setActivity(ActivityType.Playing)
-      .setState("In Game")
-      .setDetails(`Playing on ${serverName}`)
-      .setTimestamps(gameStartTime);
-    await setActivity(currentActivity);
+    await invoke("set_in_game_activity", { serverName });
     console.log(
       `Discord Rich Presence activity set to 'In Game' on server: ${serverName}.`,
     );
@@ -54,9 +39,12 @@ export async function setInGameActivity(serverName: string) {
   }
 }
 
+/**
+ * Cleans up Discord Rich Presence when the launcher is closed.
+ */
 export async function cleanupDiscordRichPresence() {
   try {
-    await destroy();
+    await invoke("cleanup_discord_rpc");
     console.log("Discord Rich Presence stopped.");
   } catch (err) {
     console.error("Failed to stop Discord Rich Presence:", err);

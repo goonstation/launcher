@@ -1,6 +1,48 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use std::sync::OnceLock;
 use std::path::PathBuf;
-use std::process::Command;
+use std::process::{Child, Command};
+use std::sync::Mutex;
+
+/// Shared state to track the DreamSeeker process
+static DREAMSEEKER_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
+
+mod discord;
+
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
+pub fn run() {
+    // Initialize Discord Rich Presence when the application starts
+    if let Err(e) = discord::init_discord_rpc() {
+        eprintln!("Failed to initialize Discord Rich Presence: {}", e);
+        // Continue execution even if Discord RPC fails
+    }
+
+    let app = tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .invoke_handler(tauri::generate_handler![
+            launch_dreamseeker,
+            is_dreamseeker_running,
+            discord::set_launcher_activity,
+            discord::set_in_game_activity,
+        ])
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+
+    app.run(|_app_handle, event| {
+        if let tauri::RunEvent::ExitRequested { .. } = event {
+            if let Err(e) = discord::cleanup_discord_rpc() {
+                eprintln!("Failed to clean up Discord Rich Presence during exit: {}", e);
+            }
+        }
+    });
+}
+
 
 /// ## Arguments
 ///
@@ -29,26 +71,33 @@ fn launch_dreamseeker(byond_path: &str, server_address: &str) -> Result<String, 
         ));
     }
 
-    // Launch dreamseeker with the server address as argument
     let result = Command::new(&path).arg(server_address).spawn();
 
     match result {
-        Ok(_) => Ok(format!("Started DreamSeeker for {}", server_address)),
+        Ok(child) => {
+            DREAMSEEKER_PROCESS.get_or_init(|| Mutex::new(None)).lock().unwrap().replace(child);
+            Ok(format!("Started DreamSeeker for {}", server_address))
+        }
         Err(e) => Err(format!("Failed to launch DreamSeeker: {}", e)),
     }
 }
 
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_http::init())
-        .plugin(tauri_plugin_fs::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_process::init())
-        .plugin(tauri_plugin_drpc::init())
-        .invoke_handler(tauri::generate_handler![launch_dreamseeker])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+/// Check if DreamSeeker is still running
+#[tauri::command]
+fn is_dreamseeker_running() -> bool {
+    if let Some(process_mutex) = DREAMSEEKER_PROCESS.get() {
+        let mut process_guard = process_mutex.lock().unwrap();
+        if let Some(child) = &mut *process_guard {
+            match child.try_wait() {
+                Ok(Some(_)) => false, // Process has exited
+                Ok(None) => true,     // Process is still running
+                Err(_) => false,      // Error occurred, assume not running
+            }
+        } else {
+            false // No process tracked
+        }
+    } else {
+        false // No process initialized
+    }
 }
+

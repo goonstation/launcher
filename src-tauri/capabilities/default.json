@@ -23,7 +23,6 @@
     "fs:default",
     "updater:default",
     "process:default",
-    "drpc:default",
     "fs:allow-appcache-write",
     "fs:allow-appdata-write"
   ]

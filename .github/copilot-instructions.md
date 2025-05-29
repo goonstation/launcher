@@ -24,5 +24,6 @@ Use single-line jsdoc comments unless they're multiline. For example,
 `/** foobar */`
 
 Don't rerun the `deno task tauri dev` every time, I'm running it in the
-background. We install using deno, for example
+Do not use npm to install/uninstall. We use deno for package management.
+We install using deno, for example
 `deno install npm:@tauri-apps/plugin-shell`

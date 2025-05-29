@@ -13,10 +13,7 @@ import {
 } from "./services/uiService.ts";
 import { initUpdateUIService } from "./services/updateUIService.ts";
 import { startupUpdateCheck } from "./services/updateService.ts";
-import {
-  cleanupDiscordRichPresence,
-  initDiscordRichPresence,
-} from "./services/discordRichPresenceService.ts";
+import { stopDreamSeekerMonitor } from "./services/serverJoinService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -50,9 +47,6 @@ function initApp() {
 
   // Initialize auto update check
   startupUpdateCheck();
-
-  // Initialize Discord Rich Presence
-  initDiscordRichPresence();
 
   // Set up button event listeners for refresh and exit
   refreshButton.addEventListener("click", updateServerStatus);
@@ -99,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("contextmenu", (e) => e.preventDefault());
 });
 
+// Cleanup when the application is closed
 globalThis.addEventListener("beforeunload", () => {
-  // Cleanup Discord Rich Presence
-  cleanupDiscordRichPresence();
+  stopDreamSeekerMonitor();
 });
