@@ -19,6 +19,8 @@ for checking server status and launching the game to connect to a server.
    - Error handling for connection issues
    - Caching server status information, using it if needed
 
+Strive for simple, clean, and efficient code.
+
 Be terse with comments, don't add unnecessary ones if it's obvious what the code does.
 Use single-line jsdoc comments unless they're multiline. For example,
 `/** foobar */`
