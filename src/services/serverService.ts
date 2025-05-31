@@ -43,7 +43,9 @@ export interface ServerInfo {
   invisible: boolean;
   created_at: string;
   updated_at: string;
-  player_count?: number;
+  player_count: number;
+  current_round_id: number;
+  current_map: string;
 }
 
 export enum ServerDataState {

@@ -86,11 +86,11 @@ export function createServerButtons(servers: ServerInfo[]) {
 
     const line2 = document.createElement("span");
     line2.style.display = "block";
-    line2.textContent = "Cogmap2";
+    line2.textContent = server.current_map;
 
     const line3 = document.createElement("span");
     line3.style.display = "block";
-    line3.textContent = `69 online`;
+    line3.textContent = `${server.player_count} online`;
 
     button.appendChild(line1);
     button.appendChild(line2);
