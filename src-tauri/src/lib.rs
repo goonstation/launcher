@@ -12,10 +12,11 @@ mod discord;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Initialize Discord Rich Presence when the application starts
-    if let Err(e) = discord::init_discord_rpc() {
-        eprintln!("Failed to initialize Discord Rich Presence: {}", e);
-        // Continue execution even if Discord RPC fails
-    }
+    // Temporarily disabled Discord Rich Presence - will be added in a later update
+    // if let Err(e) = discord::init_discord_rpc() {
+    //     eprintln!("Failed to initialize Discord Rich Presence: {}", e);
+    //     // Continue execution even if Discord RPC fails
+    // }
 
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -36,9 +37,10 @@ pub fn run() {
 
     app.run(|_app_handle, event| {
         if let tauri::RunEvent::ExitRequested { .. } = event {
-            if let Err(e) = discord::cleanup_discord_rpc() {
-                eprintln!("Failed to clean up Discord Rich Presence during exit: {}", e);
-            }
+            // Temporarily disabled Discord Rich Presence - will be added in a later update
+            // if let Err(e) = discord::cleanup_discord_rpc() {
+            //     eprintln!("Failed to clean up Discord Rich Presence during exit: {}", e);
+            // }
         }
     });
 }
