@@ -9,7 +9,10 @@
     "core:window:allow-close",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://api.goonhub.com" }]
+      "allow": [
+        { "url": "https://api.goonhub.com" },
+        { "url": "https://raw.githubusercontent.com" }
+      ]
     },
     "opener:default",
     {

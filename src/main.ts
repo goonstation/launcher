@@ -14,6 +14,7 @@ import {
 import { initUpdateUIService } from "./services/updateUIService.ts";
 import { startupUpdateCheck } from "./services/updateService.ts";
 import { stopDreamSeekerMonitor } from "./services/serverJoinService.ts";
+import { checkByondVersion } from "./services/byondService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -47,6 +48,25 @@ function initApp() {
 
   // Initialize auto update check
   startupUpdateCheck();
+
+  // Check BYOND version
+  checkByondVersion()
+    .then((result) => {
+      if (
+        (result.isInstalled && !result.hasCorrectVersion) || !result.isInstalled
+      ) {
+        // Just log the result for now, UI notifications will be added later
+        console.log("BYOND update needed:", {
+          currentVersion: result.currentVersion,
+          requiredVersion: result.requiredVersion,
+          isInstalled: result.isInstalled,
+        });
+        // TODO: Add UI notification for BYOND update here in the future
+      }
+    })
+    .catch((error) => {
+      console.error("Error checking BYOND version:", error);
+    });
 
   // Set up button event listeners for refresh and exit
   refreshButton.addEventListener("click", updateServerStatus);

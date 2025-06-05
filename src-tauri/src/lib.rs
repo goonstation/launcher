@@ -8,6 +8,7 @@ use std::sync::Mutex;
 static DREAMSEEKER_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
 
 mod discord;
+mod byond;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -25,9 +26,13 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             launch_dreamseeker,
             is_dreamseeker_running,
+            byond::get_byond_version,
+            byond::download_byond_installer,
+            byond::install_byond,
             discord::set_launcher_activity,
             discord::set_in_game_activity,
         ])
