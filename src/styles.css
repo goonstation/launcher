@@ -286,3 +286,18 @@ button {
 #close-modal-button:active {
   border: 1px inset #8a8a8a;
 }
+
+#license-notice {
+  position: absolute;
+  top: 1.5rem;
+  right: 0.2rem;
+  font-size: 0.7rem;
+  color: #777;
+  cursor: help;
+  user-select: none;
+}
+
+#license-notice:hover {
+  color: #999;
+  text-decoration: underline;
+}
