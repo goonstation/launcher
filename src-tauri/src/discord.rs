@@ -9,14 +9,16 @@ static DISCORD_CLIENT: OnceLock<Mutex<Option<DiscordIpcClient>>> = OnceLock::new
 
 /// Update Discord Rich Presence to show in-game status
 #[tauri::command]
-pub fn set_in_game_activity(server_name: &str) -> Result<(), String> {
-    set_discord_activity("In Game", server_name)
+pub fn set_in_game_activity(_server_name: &str) -> Result<(), String> {
+    // set_discord_activity("In Game", server_name) TODO DISABLED
+    Ok(())
 }
 
 /// Update Discord Rich Presence to show in-launcher status
 #[tauri::command]
 pub fn set_launcher_activity() -> Result<(), String> {
-    set_discord_activity("In Launcher", "Browsing servers")
+    // set_discord_activity("In Launcher", "Browsing servers") TODO DISABLED
+    Ok(())
 }
 
 /// Initialize Discord Rich Presence

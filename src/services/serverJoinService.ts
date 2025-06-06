@@ -7,16 +7,16 @@ import { getSettings, LaunchMethod } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
 
 // Directly invoke Rust commands for Discord Rich Presence
-async function setInGameActivity(serverName: string): Promise<void> {
-  try {
-    await invoke("set_in_game_activity", { serverName });
-    console.log(
-      `Discord Rich Presence set to 'In Game' on server: ${serverName}`,
-    );
-  } catch (err) {
-    console.error("Failed to set in-game activity:", err);
-  }
-}
+// async function setInGameActivity(serverName: string): Promise<void> {
+//   try {
+//     await invoke("set_in_game_activity", { serverName });
+//     console.log(
+//       `Discord Rich Presence set to 'In Game' on server: ${serverName}`,
+//     );
+//   } catch (err) {
+//     console.error("Failed to set in-game activity:", err);
+//   }
+// }
 
 async function setLauncherActivity(): Promise<void> {
   try {
@@ -47,7 +47,7 @@ export async function joinServer(
     if (settings.launchMethod === LaunchMethod.BYOND_PAGER) {
       await openUrl(byondUrl);
       setNoticeMessage(`✅ Opened ${server.short_name} in BYOND pager`);
-      await setInGameActivity(server.name);
+      // await setInGameActivity(server.name);
       // Start monitoring for BYOND pager (though this might be less reliable)
       startDreamSeekerMonitor(server);
     } else if (settings.launchMethod === LaunchMethod.DREAM_SEEKER) {
@@ -65,7 +65,7 @@ export async function joinServer(
 
         console.log("DreamSeeker launch result:", result);
         setNoticeMessage(`✅ Started DreamSeeker for ${server.short_name}`);
-        await setInGameActivity(server.name);
+        // await setInGameActivity(server.name);
 
         // Start monitoring DreamSeeker process
         startDreamSeekerMonitor(server);
