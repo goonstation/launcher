@@ -1,0 +1,13 @@
+## Asset License
+
+All files within this folder (`src/assets/`) are [licensed](./LICENSE) under
+CC-BY-NC-SA 3.0 unless otherwise indicated.
+
+### Asset Sources:
+
+- Goonstation logo by Gannets
+- Modified Goonhub logo by Wire and ZeWaka
+- [Discord, GitHub, and Wiki logos](https://github.com/goonstation/goonstation/tree/86b532b6a26a6b1ff233c581567f0c4fc588bb0d/browserassets/src/images/motd)
+  by Zamujasa and Flaborized
+- [Bubs Bee](https://github.com/goonstation/goonstation/blob/86b532b6a26a6b1ff233c581567f0c4fc588bb0d/icons/misc/bee.dmi)
+  by SpyGuy(?)

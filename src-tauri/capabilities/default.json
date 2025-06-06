@@ -11,7 +11,8 @@
       "identifier": "http:default",
       "allow": [
         { "url": "https://api.goonhub.com" },
-        { "url": "https://raw.githubusercontent.com" }
+        { "url": "https://raw.githubusercontent.com" },
+        { "url": "https://www.byond.com" }
       ]
     },
     "opener:default",
@@ -20,6 +21,18 @@
       "allow": [
         {
           "url": "byond:*"
+        },
+        {
+          "url": "https://goonhub.com"
+        },
+        {
+          "url": "https://discord.gg/zd8t6pY"
+        },
+        {
+          "url": "https://github.com/goonstation/*"
+        },
+        {
+          "url": "https://wiki.ss13.co"
         }
       ]
     },

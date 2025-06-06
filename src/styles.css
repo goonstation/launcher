@@ -288,10 +288,20 @@ button {
   border: 1px inset #8a8a8a;
 }
 
-#license-notice {
+#repo-notice {
   position: absolute;
   top: 1.5rem;
   right: 0.2rem;
+  font-size: 0.7rem;
+  color: #777;
+
+  user-select: none;
+}
+
+#license-notice {
+  position: absolute;
+  top: 1.5rem;
+  right: 2.5rem;
   font-size: 0.7rem;
   color: #777;
   cursor: help;

@@ -19,6 +19,7 @@ import {
   initByondUIService,
 } from "./services/byondUIService.ts";
 import { checkAndClearOverrideIfNeeded } from "./services/byondService.ts";
+import { initExternalLinkService } from "./services/externalLinkService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -45,6 +46,7 @@ function initApp() {
   initSettingsUIService(settingsButton);
   initUpdateUIService();
   initByondUIService();
+  initExternalLinkService();
 
   // Initialize settings
   getSettings().catch((error) => {
