@@ -15,8 +15,8 @@ import { initUpdateUIService } from "./services/updateUIService.ts";
 import { startupUpdateCheck } from "./services/updateService.ts";
 import { stopDreamSeekerMonitor } from "./services/serverJoinService.ts";
 import {
-  initByondUIService,
   checkAndShowByondStatus,
+  initByondUIService,
 } from "./services/byondUIService.ts";
 
 function initApp() {

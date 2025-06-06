@@ -21,11 +21,10 @@ for checking server status and launching the game to connect to a server.
 
 Strive for simple, clean, and efficient code.
 
-Be terse with comments, don't add unnecessary ones if it's obvious what the code does.
-Use single-line jsdoc comments unless they're multiline. For example,
+Be terse with comments, don't add unnecessary ones if it's obvious what the code
+does. Use single-line jsdoc comments unless they're multiline. For example,
 `/** foobar */`
 
-Don't rerun the `deno task tauri dev` every time, I'm running it in the
-Do not use npm to install/uninstall. We use deno for package management.
-We install using deno, for example
-`deno install npm:@tauri-apps/plugin-shell`
+Don't rerun the `deno task tauri dev` every time, I'm running it in the Do not
+use npm to install/uninstall. We use deno for package management. We install
+using deno, for example `deno install npm:@tauri-apps/plugin-shell`
