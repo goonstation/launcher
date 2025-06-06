@@ -172,7 +172,7 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
 
     if !output.status.success() {
         return Err(format!(
-            "Installer exited with non-zero status: {}",
+            "Installer exited with failure status: {}",
             String::from_utf8_lossy(&output.stderr)
         ));
     }

@@ -1,0 +1,69 @@
+/* BYOND notification styles, similar to update notification but top right */
+.byond-notification {
+  position: absolute;
+  top: 0.5rem;
+  right: 6.25rem;
+  max-width: 22%;
+  background: linear-gradient(to bottom, #003366, #1a1a2a);
+  border: 0.1rem solid var(--status-offline);
+  border-radius: 4px;
+  padding: 0.8rem;
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(255, 0, 0, 0.3),
+    0 0 8px rgba(255, 0, 0, 0.5);
+  color: white;
+  z-index: 1001;
+  animation: byond-glow 1s infinite alternate;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+}
+
+.byond-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#byond-text {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  text-align: center;
+}
+
+.byond-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.byond-button {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 0.3rem;
+  background: linear-gradient(to bottom, #555, #151515);
+  color: white;
+  border: 1px solid var(--status-offline);
+}
+
+.byond-button:hover {
+  background: linear-gradient(to bottom, #c14040, #333);
+}
+
+@keyframes byond-glow {
+  from {
+    box-shadow:
+      0 0 0 1px #000022,
+      inset 0 0 5px rgba(255, 0, 0, 0.3),
+      0 0 8px rgba(255, 0, 0, 0.5);
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+  }
+  to {
+    box-shadow:
+      0 0 0 1px #000022,
+      inset 0 0 10px rgba(255, 0, 0, 0.5),
+      0 0 15px rgba(255, 0, 0, 0.7);
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.9);
+  }
+}

@@ -1,6 +1,7 @@
 @import "./theme.css";
 @import "./join-buttons.css";
 @import "./update-notification.css";
+@import "./byond-notification.css";
 
 .hidden {
   display: none;

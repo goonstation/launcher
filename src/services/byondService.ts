@@ -142,6 +142,8 @@ export async function downloadAndInstallByond(): Promise<{
       minor: requiredVersion.minor,
     });
 
+    console.log("Download result: ", downloadResult.message);
+
     if (!downloadResult.success) {
       return {
         success: false,
