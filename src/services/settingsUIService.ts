@@ -1,5 +1,6 @@
 // Settings UI service for managing settings interface
 
+import { fetchRequiredByondVersion } from "./byondService.ts";
 import {
   getSettings,
   LaunchMethod,
@@ -13,28 +14,19 @@ import { setNoticeMessage } from "./uiService.ts";
 export function initSettingsUIService(
   settingsBtn: HTMLButtonElement,
 ) {
-  // Set up settings button click handler
   settingsBtn.addEventListener("click", () => {
-    const modal = document.querySelector("#settings-modal");
-    if (modal) {
-      const isCurrentlyHidden = modal.classList.contains("hidden");
-      toggleSettingsModal(isCurrentlyHidden);
-    }
+    const modal = document.querySelector("#settings-modal")!;
+    const isCurrentlyHidden = modal.classList.contains("hidden");
+    toggleSettingsModal(isCurrentlyHidden);
   });
 
-  // Set up close modal button
-  const closeModalButton = document.querySelector("#close-modal-button");
-  if (closeModalButton) {
-    closeModalButton.addEventListener("click", () => {
-      toggleSettingsModal(false);
-    });
-  }
+  const closeModalButton = document.querySelector("#close-modal-button")!;
+  closeModalButton.addEventListener("click", () => {
+    toggleSettingsModal(false);
+  });
 
-  // Set up settings form submission
-  const settingsForm = document.querySelector("#settings-modal form");
-  if (settingsForm) {
-    settingsForm.addEventListener("submit", handleSettingsSubmit);
-  }
+  const settingsForm = document.querySelector("#settings-modal form")!;
+  settingsForm.addEventListener("submit", handleSettingsSubmit);
 }
 
 /**
@@ -43,12 +35,13 @@ export function initSettingsUIService(
 export function toggleSettingsModal(show: boolean) {
   const modal = document.querySelector("#settings-modal");
   if (!modal) return;
-  modal.classList.toggle("hidden", !show);
 
   // If showing the modal, load current settings
   if (show) {
     loadSettingsIntoForm();
   }
+
+  modal.classList.toggle("hidden", !show);
 }
 
 /**
@@ -64,9 +57,12 @@ async function handleSettingsSubmit(event: Event) {
   const launchMethodSelect = document.querySelector<HTMLSelectElement>(
     "#byond-mode",
   );
+  const byondVersionOverrideInput = document.querySelector<HTMLInputElement>(
+    "#byond-version-override",
+  );
 
   // Validate inputs exist
-  if (!byondPathInput || !launchMethodSelect) {
+  if (!byondPathInput || !launchMethodSelect || !byondVersionOverrideInput) {
     console.error("Form inputs not found");
     return;
   }
@@ -76,6 +72,7 @@ async function handleSettingsSubmit(event: Event) {
     const success = await updateSettings({
       byondPath: byondPathInput.value.trim(),
       launchMethod: launchMethodSelect.value as LaunchMethod,
+      byondVersionOverride: byondVersionOverrideInput.value.trim() || null,
     });
 
     if (success) {
@@ -91,22 +88,25 @@ async function handleSettingsSubmit(event: Event) {
 async function loadSettingsIntoForm() {
   try {
     const settings = await getSettings();
+    const requiredVersion = await fetchRequiredByondVersion();
 
-    // Get form elements
     const byondPathInput = document.querySelector<HTMLInputElement>(
       "#byond-path",
-    );
+    )!;
     const launchMethodSelect = document.querySelector<HTMLSelectElement>(
       "#byond-mode",
-    );
+    )!;
+    const byondVersionOverrideInput = document.querySelector<HTMLInputElement>(
+      "#byond-version-override",
+    )!;
 
-    // Update form values
-    if (byondPathInput) {
-      byondPathInput.value = settings.byondPath;
-    }
+    byondPathInput.value = settings.byondPath;
+    launchMethodSelect.value = settings.launchMethod;
+    byondVersionOverrideInput.value = settings.byondVersionOverride || "";
 
-    if (launchMethodSelect) {
-      launchMethodSelect.value = settings.launchMethod;
+    if (requiredVersion) {
+      byondVersionOverrideInput.placeholder =
+        `${requiredVersion.major}.${requiredVersion.minor} (leave empty for recommended)`;
     }
   } catch (error) {
     console.error("Error loading settings into form:", error);

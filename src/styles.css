@@ -87,6 +87,7 @@ button {
 }
 
 #mute-button {
+  top: 3.5rem;
   right: 0.5rem;
 }
 
@@ -95,7 +96,7 @@ button {
 }
 
 #settings-button {
-  right: 3.5rem;
+  right: 0.5rem;
 }
 
 .logo {

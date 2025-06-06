@@ -18,6 +18,7 @@ import {
   checkAndShowByondStatus,
   initByondUIService,
 } from "./services/byondUIService.ts";
+import { checkAndClearOverrideIfNeeded } from "./services/byondService.ts";
 
 function initApp() {
   const backgroundMusic = document.querySelector<HTMLAudioElement>(
@@ -55,6 +56,14 @@ function initApp() {
 
   // Check BYOND version and show notification if needed
   checkAndShowByondStatus();
+
+  // Check if BYOND version in Github has changed and reset any override
+  checkAndClearOverrideIfNeeded();
+
+  // Setup periodic check for BYOND version changes (every 30 minutes)
+  setInterval(() => {
+    checkAndClearOverrideIfNeeded();
+  }, 30 * 60 * 1000); // 30 minutes
 
   // Set up button event listeners for refresh and exit
   refreshButton.addEventListener("click", updateServerStatus);

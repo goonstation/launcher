@@ -15,12 +15,19 @@ export interface UserSettings {
   byondPath: string;
   launchMethod: LaunchMethod;
   isMuted: boolean;
+  byondVersionOverride: string | null;
+  lastFetchedGithubVersion: {
+    major: number;
+    minor: number;
+  } | null;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
   byondPath: "C:\\Program Files (x86)\\BYOND",
   launchMethod: LaunchMethod.DREAM_SEEKER,
   isMuted: false,
+  byondVersionOverride: null,
+  lastFetchedGithubVersion: null,
 };
 const SETTINGS_FILENAME = "user_settings.json";
 

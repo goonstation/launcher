@@ -2,8 +2,8 @@
 .byond-notification {
   position: absolute;
   top: 0.5rem;
-  right: 6.25rem;
-  max-width: 22%;
+  right: 3.5rem;
+  max-width: 26%;
   background: linear-gradient(to bottom, #003366, #1a1a2a);
   border: 0.1rem solid var(--status-offline);
   border-radius: 4px;

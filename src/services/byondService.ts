@@ -31,6 +31,9 @@ function parseByondVersion(configText: string): ByondVersion | null {
   }
 }
 
+// Storage of last fetched github version to detect changes is now stored in settings
+// Let's remove the in-memory variable and use the settings version instead
+
 /** Fetch the required BYOND version from the Goonstation repository */
 export async function fetchRequiredByondVersion(): Promise<
   ByondVersion | null
@@ -44,7 +47,57 @@ export async function fetchRequiredByondVersion(): Promise<
     }
 
     const configText = await response.text();
-    return parseByondVersion(configText);
+    const parsedVersion = parseByondVersion(configText);
+
+    // Get settings and check for version changes
+    const settings = await getSettings();
+
+    // Store the fetched version in settings (do this first to ensure we have the latest version)
+    if (parsedVersion) {
+      // Only update if version is different to reduce settings writes
+      if (
+        !settings.lastFetchedGithubVersion ||
+        settings.lastFetchedGithubVersion.major !== parsedVersion.major ||
+        settings.lastFetchedGithubVersion.minor !== parsedVersion.minor
+      ) {
+        // If version changed, also clear any override
+        if (
+          settings.lastFetchedGithubVersion && settings.byondVersionOverride
+        ) {
+          console.log("BYOND version changed in Github, clearing override");
+          await updateSettings({
+            byondVersionOverride: null,
+            lastFetchedGithubVersion: parsedVersion,
+          });
+        } else {
+          // Just update the version without clearing override
+          await updateSettings({ lastFetchedGithubVersion: parsedVersion });
+        }
+      }
+    }
+
+    // Check if there's an override in settings
+    if (
+      settings.byondVersionOverride &&
+      settings.byondVersionOverride.trim() !== ""
+    ) {
+      // Parse the override (expected format: "514.1589")
+      const parts = settings.byondVersionOverride.split(".");
+      if (parts.length === 2) {
+        const major = parseInt(parts[0], 10);
+        const minor = parseInt(parts[1], 10);
+
+        if (!isNaN(major) && !isNaN(minor)) {
+          return { major, minor };
+        }
+      }
+
+      console.warn(
+        `Invalid BYOND version override format: ${settings.byondVersionOverride}`,
+      );
+    }
+
+    return parsedVersion;
   } catch (error) {
     console.error("Error fetching required BYOND version:", error);
     return null;
@@ -71,8 +124,37 @@ export async function checkByondVersion(): Promise<{
   hasCorrectVersion: boolean;
   currentVersion: ByondVersion | null;
   requiredVersion: ByondVersion | null;
+  githubVersion: ByondVersion | null; // The actual GitHub version
 }> {
   try {
+    // We need to get the GitHub version directly first, before any overrides
+    const settings = await getSettings();
+    let githubVersion = null;
+
+    // Get the GitHub version (this will be the real required version from the server)
+    try {
+      const response = await fetch(BYOND_CONFIG_URL);
+      if (response.ok) {
+        const configText = await response.text();
+        githubVersion = parseByondVersion(configText);
+
+        // Make sure we keep the settings up to date
+        if (
+          githubVersion &&
+          (!settings.lastFetchedGithubVersion ||
+            githubVersion.major !== settings.lastFetchedGithubVersion.major ||
+            githubVersion.minor !== settings.lastFetchedGithubVersion.minor)
+        ) {
+          await updateSettings({ lastFetchedGithubVersion: githubVersion });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching GitHub version:", error);
+      // Fall back to cached version
+      githubVersion = settings.lastFetchedGithubVersion;
+    }
+
+    // Now get the potentially overridden version
     const requiredVersion = await fetchRequiredByondVersion();
     if (!requiredVersion) {
       return {
@@ -80,6 +162,7 @@ export async function checkByondVersion(): Promise<{
         hasCorrectVersion: false,
         currentVersion: null,
         requiredVersion: null,
+        githubVersion: null,
       };
     }
 
@@ -102,6 +185,7 @@ export async function checkByondVersion(): Promise<{
       hasCorrectVersion,
       currentVersion,
       requiredVersion,
+      githubVersion,
     };
   } catch (error) {
     console.error("Error checking BYOND version:", error);
@@ -110,6 +194,7 @@ export async function checkByondVersion(): Promise<{
       hasCorrectVersion: false,
       currentVersion: null,
       requiredVersion: null,
+      githubVersion: null,
     };
   }
 }
@@ -178,5 +263,63 @@ export async function downloadAndInstallByond(): Promise<{
       success: false,
       message: `Error installing BYOND: ${String(error)}`,
     };
+  }
+}
+
+/** Compare two BYOND versions for equality */
+function areByondVersionsEqual(
+  v1: ByondVersion | null,
+  v2: ByondVersion | null,
+): boolean {
+  if (!v1 || !v2) return false;
+  return v1.major === v2.major && v1.minor === v2.minor;
+}
+
+/** Check if the required BYOND version has changed from what was last fetched */
+export async function hasRequiredVersionChanged(
+  currentVersion: ByondVersion | null,
+): Promise<boolean> {
+  const settings = await getSettings();
+  const lastFetchedGithubVersion = settings.lastFetchedGithubVersion;
+
+  if (!currentVersion || !lastFetchedGithubVersion) return false;
+
+  return !areByondVersionsEqual(currentVersion, lastFetchedGithubVersion);
+}
+
+/**
+ * Check and clear BYOND version override if the github version changed.
+ * This ensures the override gets reset every time the recommended version changes.
+ */
+export async function checkAndClearOverrideIfNeeded(): Promise<void> {
+  try {
+    // Fetch fresh version from github
+    const response = await fetch(BYOND_CONFIG_URL);
+    if (!response.ok) return;
+
+    const configText = await response.text();
+    const githubVersion = parseByondVersion(configText);
+
+    const settings = await getSettings();
+
+    // If no github version or no previously cached version, just update cache
+    if (!githubVersion || !settings.lastFetchedGithubVersion) {
+      await updateSettings({ lastFetchedGithubVersion: githubVersion });
+      return;
+    }
+
+    // Check if version changed
+    if (
+      !areByondVersionsEqual(githubVersion, settings.lastFetchedGithubVersion)
+    ) {
+      console.log("BYOND version changed in Github, clearing any override");
+      await updateSettings({
+        byondVersionOverride: null,
+        lastFetchedGithubVersion: githubVersion,
+      });
+      console.log("BYOND version override cleared due to version change");
+    }
+  } catch (error) {
+    console.error("Error checking BYOND version override:", error);
   }
 }

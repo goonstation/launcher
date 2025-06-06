@@ -1,6 +1,7 @@
 // BYOND notification UI service
 
 import { checkByondVersion, downloadAndInstallByond } from "./byondService.ts";
+import { getSettings } from "./settingsService.ts";
 
 // DOM Elements
 let byondNotification: HTMLElement;
@@ -76,6 +77,7 @@ export function showByondNotification(
 export async function checkAndShowByondStatus(): Promise<void> {
   try {
     const result = await checkByondVersion();
+    const settings = await getSettings();
 
     if (!result.isInstalled) {
       showByondNotification("BYOND is not installed.", true, {
@@ -86,15 +88,32 @@ export async function checkAndShowByondStatus(): Promise<void> {
       result.requiredVersion &&
       result.currentVersion
     ) {
+      // Build notification details
+      const details = [];
+
+      // First, show GitHub required version
+      if (result.githubVersion) {
+        details.push(
+          `Reccomended: ${result.githubVersion.major}.${result.githubVersion.minor}`,
+        );
+      }
+
+      // Show override if active
+      if (settings.byondVersionOverride) {
+        details.push(`⚠️ Override: ${settings.byondVersionOverride}`);
+      }
+
+      // Show installed version
+      details.push(
+        `Installed: ${result.currentVersion.major}.${result.currentVersion.minor}`,
+      );
+
       showByondNotification(
         `BYOND version mismatch.`,
         true,
         {
           title: "BYOND version mismatch",
-          details: [
-            `Required: ${result.requiredVersion.major}.${result.requiredVersion.minor}`,
-            `Installed: ${result.currentVersion.major}.${result.currentVersion.minor}`,
-          ],
+          details: details,
         },
       );
     }

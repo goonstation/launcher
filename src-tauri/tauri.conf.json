@@ -14,7 +14,7 @@
     "windows": [
       {
         "title": "Goonstation Launcher",
-        "width": 700,
+        "width": 680,
         "height": 560,
         "visible": false,
         "resizable": true,
