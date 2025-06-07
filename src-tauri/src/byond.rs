@@ -28,46 +28,62 @@ pub struct InstallResult {
 /// Get the version of BYOND installed at the specified path
 #[tauri::command]
 pub fn get_byond_version(byond_path: &str) -> Result<ByondVersion, String> {
-    let dm_path = Path::new(byond_path).join("bin").join("dm.exe");
+    let dd_path = Path::new(byond_path).join("bin").join("dd.exe");
 
-    if !dm_path.exists() {
-        return Err(format!("DM executable not found at {}", dm_path.display()));
+    if !dd_path.exists() {
+        return Err(format!("Dream Daemon executable not found at {}", dd_path.display()));
     }
 
-    let output = Command::new(&dm_path)
-        .arg("-h")
+
+
+    let mut cmd = Command::new(&dd_path);
+
+    #[cfg(windows)]
+    {
+      use std::os::windows::process::CommandExt;
+      const CREATE_NO_WINDOW: u32 = 0x08000000;
+      cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+
+    let output = cmd.arg("-version")
         .output()
-        .map_err(|e| format!("Failed to execute dm.exe: {}", e))?;
+        .map_err(|e| format!("Failed to execute dd.exe: {}", e))?;
 
     let stdout = String::from_utf8_lossy(&output.stdout);
 
-    // dm.exe -h intentionally returns exit code 1, so we ignore the status
-    // and just check if we have output to parse
+    // Check if the command executed successfully
+    if !output.status.success() {
+        return Err(format!("dd.exe failed with status: {}", output.status));
+    }
 
     parse_byond_version(&stdout)
 }
 
-/// Parse the version from the DM compiler output
+/// Parse the version from the Dream Daemon output
+/// `dd.exe -version` returns a line like "BYOND 5.0 Public (Version 516.1663) on Microsoft Windows"
 fn parse_byond_version(output: &str) -> Result<ByondVersion, String> {
-    // Look for a line like "DM compiler version 516.1663"
+
     for line in output.lines() {
-        if line.contains("DM compiler version") {
-            let version_str = line
-                .split_whitespace()
-                .last()
-                .ok_or("Invalid version output format")?;
+        if line.contains("BYOND") && line.contains("Version") {
+            // Extract version number from between parentheses
+            let start = line.find("Version ");
+            let end = line.find(")");
 
-            let parts: Vec<&str> = version_str.split('.').collect();
-            if parts.len() != 2 {
-                return Err(format!("Invalid version format: {}", version_str));
+            if let (Some(s), Some(e)) = (start, end) {
+                let version_str = &line[s + "Version ".len()..e];
+
+                let parts: Vec<&str> = version_str.split('.').collect();
+                if parts.len() != 2 {
+                    return Err(format!("Invalid version format: {}", version_str));
+                }
+
+                let major = parts[0].parse::<u32>()
+                    .map_err(|e| format!("Failed to parse major version: {}", e))?;
+                let minor = parts[1].parse::<u32>()
+                    .map_err(|e| format!("Failed to parse minor version: {}", e))?;
+
+                return Ok(ByondVersion { major, minor });
             }
-
-            let major = parts[0].parse::<u32>()
-                .map_err(|e| format!("Failed to parse major version: {}", e))?;
-            let minor = parts[1].parse::<u32>()
-                .map_err(|e| format!("Failed to parse minor version: {}", e))?;
-
-            return Ok(ByondVersion { major, minor });
         }
     }
 
@@ -172,7 +188,7 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
 
     if !output.status.success() {
         return Err(format!(
-            "Installer exited with failure status: {}",
+            "Installer exited with failure status {}",
             String::from_utf8_lossy(&output.stderr)
         ));
     }
