@@ -1,10 +1,5 @@
 :root {
-  --primary-color: #0c1445;
-  --secondary-color: #24c8db;
-  --text-color: #00ffff;
-  --dark-bg: #000033;
-  --button-gradient-start: #0066cc;
-  --button-gradient-end: #003366;
+  --glow-color-blue: #00ffff;
   --button-border: #00ccff;
   --status-online: #00ff00;
   --status-offline: #ff0000;

@@ -7,6 +7,7 @@ import {
   updateSettings,
 } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
+import packageInfo from "../../package.json" with { type: "json" };
 
 /**
  * Initialize settings UI service
@@ -27,6 +28,10 @@ export function initSettingsUIService(
 
   const settingsForm = document.querySelector("#settings-modal form")!;
   settingsForm.addEventListener("submit", handleSettingsSubmit);
+
+  const repoNotice = document.querySelector("#version")!;
+  repoNotice.textContent = `Version ${packageInfo.version}`;
+  repoNotice.setAttribute("title", `Version ${packageInfo.version}`);
 }
 
 /**
