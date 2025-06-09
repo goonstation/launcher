@@ -94,7 +94,7 @@ export async function checkAndShowByondStatus(): Promise<void> {
       // First, show GitHub required version
       if (result.githubVersion) {
         details.push(
-          `Reccomended: ${result.githubVersion.major}.${result.githubVersion.minor}`,
+          `Recommended: ${result.githubVersion.major}.${result.githubVersion.minor}`,
         );
       }
 
