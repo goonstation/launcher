@@ -1,6 +1,6 @@
 [package]
 name = "goonstation-launcher"
-version = "0.2.0"
+version = "0.2.1"
 description = "A server launcher for Goonstation"
 authors = ["ZeWaka"]
 edition = "2024"
