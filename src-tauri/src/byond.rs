@@ -1,8 +1,8 @@
-use std::path::{Path};
-use std::process::Command;
-use std::fs::{self, File};
-use std::io::{Write};
 use serde::{Deserialize, Serialize};
+use std::fs::{self, File};
+use std::io::Write;
+use std::path::Path;
+use std::process::Command;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_http::reqwest;
 
@@ -31,30 +31,31 @@ pub fn get_byond_version(byond_path: &str) -> Result<ByondVersion, String> {
     let dd_path = Path::new(byond_path).join("bin").join("dd.exe");
 
     if !dd_path.exists() {
-        return Err(format!("Dream Daemon executable not found at {}", dd_path.display()));
+        return Err(format!(
+            "Dream Daemon executable not found at {}",
+            dd_path.display()
+        ));
     }
-
-
 
     let mut cmd = Command::new(&dd_path);
 
     #[cfg(windows)]
     {
-      use std::os::windows::process::CommandExt;
-      const CREATE_NO_WINDOW: u32 = 0x08000000;
-      cmd.creation_flags(CREATE_NO_WINDOW);
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
     }
 
-    let output = cmd.arg("-version")
+    let output = cmd
+        .arg("-version")
         .output()
         .map_err(|e| format!("Failed to execute dd.exe: {}", e))?;
 
-    let stdout = String::from_utf8_lossy(&output.stdout);
-
-    // Check if the command executed successfully
     if !output.status.success() {
         return Err(format!("dd.exe failed with status: {}", output.status));
     }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
 
     parse_byond_version(&stdout)
 }
@@ -62,7 +63,6 @@ pub fn get_byond_version(byond_path: &str) -> Result<ByondVersion, String> {
 /// Parse the version from the Dream Daemon output
 /// `dd.exe -version` returns a line like "BYOND 5.0 Public (Version 516.1663) on Microsoft Windows"
 fn parse_byond_version(output: &str) -> Result<ByondVersion, String> {
-
     for line in output.lines() {
         if line.contains("BYOND") && line.contains("Version") {
             // Extract version number from between parentheses
@@ -77,9 +77,11 @@ fn parse_byond_version(output: &str) -> Result<ByondVersion, String> {
                     return Err(format!("Invalid version format: {}", version_str));
                 }
 
-                let major = parts[0].parse::<u32>()
+                let major = parts[0]
+                    .parse::<u32>()
                     .map_err(|e| format!("Failed to parse major version: {}", e))?;
-                let minor = parts[1].parse::<u32>()
+                let minor = parts[1]
+                    .parse::<u32>()
                     .map_err(|e| format!("Failed to parse minor version: {}", e))?;
 
                 return Ok(ByondVersion { major, minor });
@@ -95,10 +97,13 @@ fn parse_byond_version(output: &str) -> Result<ByondVersion, String> {
 pub async fn download_byond_installer(
     app_handle: AppHandle,
     major: u32,
-    minor: u32
+    minor: u32,
 ) -> Result<DownloadResult, String> {
     // Create temp directory for installer
-    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| format!("Failed to get app data directory: {}", e))?;
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data directory: {}", e))?;
     let download_dir = app_data_dir.join("byond_installer");
 
     // Create the download directory if it doesn't exist
@@ -111,35 +116,43 @@ pub async fn download_byond_installer(
     let installer_path = download_dir.join(&installer_filename);
 
     // Try primary download URL
-    let primary_url = format!("https://www.byond.com/download/build/{}/{}.{}_byond.exe", major, major, minor);
+    let primary_url = format!(
+        "https://www.byond.com/download/build/{}/{}.{}_byond.exe",
+        major, major, minor
+    );
     let client = reqwest::Client::new();
 
     match download_file(&primary_url, &installer_path, &client).await {
-        Ok(_) => {
-            Ok(DownloadResult {
-                success: true,
-                message: format!("Successfully downloaded BYOND {}.{} installer", major, minor),
-                installer_path: installer_path.to_string_lossy().to_string(),
-            })
-        },
+        Ok(_) => Ok(DownloadResult {
+            success: true,
+            message: format!(
+                "Successfully downloaded BYOND {}.{} installer",
+                major, minor
+            ),
+            installer_path: installer_path.to_string_lossy().to_string(),
+        }),
         Err(primary_error) => {
             println!("Failed to download from primary URL: {}", primary_error);
 
             // Try backup URL
-            let backup_url = format!("https://spacestation13.github.io/byond-builds/{}/{}.{}_byond.exe", major, major, minor); // TODO: Replace with actual mirror
+            let backup_url = format!(
+                "https://spacestation13.github.io/byond-builds/{}/{}.{}_byond.exe",
+                major, major, minor
+            ); // TODO: Replace with actual mirror
 
             match download_file(&backup_url, &installer_path, &client).await {
-                Ok(_) => {
-                    Ok(DownloadResult {
-                        success: true,
-                        message: format!("Successfully downloaded BYOND {}.{} installer from backup source", major, minor),
-                        installer_path: installer_path.to_string_lossy().to_string(),
-                    })
-                },
-                Err(backup_error) => {
-                    Err(format!("Failed to download BYOND installer from both sources. Primary error: {}, Backup error: {}",
-                              primary_error, backup_error))
-                }
+                Ok(_) => Ok(DownloadResult {
+                    success: true,
+                    message: format!(
+                        "Successfully downloaded BYOND {}.{} installer from backup source",
+                        major, minor
+                    ),
+                    installer_path: installer_path.to_string_lossy().to_string(),
+                }),
+                Err(backup_error) => Err(format!(
+                    "Failed to download BYOND installer from both sources. Primary error: {}, Backup error: {}",
+                    primary_error, backup_error
+                )),
             }
         }
     }
@@ -148,23 +161,27 @@ pub async fn download_byond_installer(
 /// Download a file from a URL to a specified path
 async fn download_file(url: &str, path: &Path, client: &reqwest::Client) -> Result<(), String> {
     // Make the HTTP request
-    let response = client.get(url)
+    let response = client
+        .get(url)
         .send()
         .await
         .map_err(|e| format!("Failed to send request: {}", e))?;
 
     if !response.status().is_success() {
-        return Err(format!("Failed to download file: HTTP status {}", response.status()));
+        return Err(format!(
+            "Failed to download file: HTTP status {}",
+            response.status()
+        ));
     }
 
     // Get the response bytes
-    let bytes = response.bytes()
+    let bytes = response
+        .bytes()
         .await
         .map_err(|e| format!("Failed to get response bytes: {}", e))?;
 
     // Write to file
-    let mut file = File::create(path)
-        .map_err(|e| format!("Failed to create file: {}", e))?;
+    let mut file = File::create(path).map_err(|e| format!("Failed to create file: {}", e))?;
 
     file.write_all(&bytes)
         .map_err(|e| format!("Failed to write file: {}", e))?;

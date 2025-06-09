@@ -1,14 +1,14 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-use std::sync::OnceLock;
 use std::path::PathBuf;
 use std::process::{Child, Command};
 use std::sync::Mutex;
+use std::sync::OnceLock;
 
 /// Shared state to track the DreamSeeker process
 static DREAMSEEKER_PROCESS: OnceLock<Mutex<Option<Child>>> = OnceLock::new();
 
-mod discord;
 mod byond;
+mod discord;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -39,7 +39,6 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building tauri application");
 
-
     app.run(|_app_handle, event| {
         if let tauri::RunEvent::ExitRequested { .. } = event {
             // Temporarily disabled Discord Rich Presence - will be added in a later update
@@ -49,7 +48,6 @@ pub fn run() {
         }
     });
 }
-
 
 /// ## Arguments
 ///
@@ -82,7 +80,11 @@ fn launch_dreamseeker(byond_path: &str, server_address: &str) -> Result<String, 
 
     match result {
         Ok(child) => {
-            DREAMSEEKER_PROCESS.get_or_init(|| Mutex::new(None)).lock().unwrap().replace(child);
+            DREAMSEEKER_PROCESS
+                .get_or_init(|| Mutex::new(None))
+                .lock()
+                .unwrap()
+                .replace(child);
             Ok(format!("Started DreamSeeker for {}", server_address))
         }
         Err(e) => Err(format!("Failed to launch DreamSeeker: {}", e)),
@@ -107,4 +109,3 @@ fn is_dreamseeker_running() -> bool {
         false // No process initialized
     }
 }
-

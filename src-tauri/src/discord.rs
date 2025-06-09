@@ -1,6 +1,6 @@
-use discord_rich_presence::{activity, DiscordIpc, DiscordIpcClient};
-use std::sync::OnceLock;
+use discord_rich_presence::{DiscordIpc, DiscordIpcClient, activity};
 use std::sync::Mutex;
+use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const APPLICATION_ID: &str = "1377501813862961244";
@@ -91,17 +91,17 @@ fn set_discord_activity(state: &str, details: &str) -> Result<(), String> {
 /// This function is called automatically when the app starts
 #[allow(dead_code)]
 pub fn init_discord_rpc() -> Result<(), String> {
-  set_discord_activity("In Launcher", "Browsing servers")
+    set_discord_activity("In Launcher", "Browsing servers")
 }
 
 /// Clean up the Discord Rich Presence client
 #[allow(dead_code)]
 pub fn cleanup_discord_rpc() -> Result<(), String> {
-  if let Some(client_mutex) = DISCORD_CLIENT.get() {
-    let mut client_guard = client_mutex.lock().unwrap();
-    if let Some(client) = client_guard.take() {
-      drop(client); // This will close the connection
+    if let Some(client_mutex) = DISCORD_CLIENT.get() {
+        let mut client_guard = client_mutex.lock().unwrap();
+        if let Some(client) = client_guard.take() {
+            drop(client); // This will close the connection
+        }
     }
-  }
-  Ok(())
+    Ok(())
 }
