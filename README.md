@@ -36,6 +36,7 @@ deno task tauri build
 ```bash
 deno fmt --check
 deno lint
+src-tauri> cargo fmt
 ```
 
 ## Releasing
@@ -44,3 +45,5 @@ Update the versions in:
 
 - package.json
 - cargo.toml
+
+push to release branch
