@@ -3,6 +3,7 @@ use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
+use std::time;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_http::reqwest;
 
@@ -160,9 +161,9 @@ pub async fn download_byond_installer(
 
 /// Download a file from a URL to a specified path
 async fn download_file(url: &str, path: &Path, client: &reqwest::Client) -> Result<(), String> {
-    // Make the HTTP request
     let response = client
         .get(url)
+        .timeout(time::Duration::from_secs(6))
         .send()
         .await
         .map_err(|e| format!("Failed to send request: {}", e))?;
@@ -198,20 +199,25 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
         return Err(format!("Installer not found at {}", path.display()));
     }
 
-    // Run the installer
-    let output = Command::new(path)
+    Command::new(path)
         .output()
         .map_err(|e| format!("Failed to execute installer: {}", e))?;
 
-    if !output.status.success() {
-        return Err(format!(
-            "Installer exited with failure status {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
+    // Verify installation by checking default path and registry
+    let byond_path = r"C:\Program Files (x86)\BYOND";
+    let ds_path = Path::new(byond_path).join("bin").join("dreamseeker.exe");
+    let path_exists = ds_path.exists();
 
-    Ok(InstallResult {
-        success: true,
-        message: "BYOND installed successfully".to_string(),
-    })
+    let regkey = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER)
+        .open_subkey(r"Software\Dantom\BYOND");
+
+    if path_exists || regkey.is_ok() {
+        Ok(InstallResult {
+            success: true,
+            message: format!("BYOND installed successfully at {}", byond_path),
+        })
+    } else {
+        // Neither path nor registry key found - installation likely failed (or weird custom dir)
+        Err("BYOND installation could not be verified. The installation may have been cancelled or failed.".to_string())
+    }
 }

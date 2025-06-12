@@ -2,6 +2,7 @@
 
 import { checkByondVersion, downloadAndInstallByond } from "./byondService.ts";
 import { getSettings } from "./settingsService.ts";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 // DOM Elements
 let byondNotification: HTMLElement;
@@ -29,10 +30,23 @@ export function initByondUIService() {
     if (result.success) {
       showByondNotification("", false, {
         title: "BYOND installed!",
-        details: ["Please restart the launcher."],
+        details: ["Restarting launcher..."],
       });
       byondInstallButton.style.display = "none";
-      byondDismissButton.textContent = "Close";
+      byondDismissButton.style.display = "none";
+
+      // Restart launcher after 1 second
+      setTimeout(async () => {
+        try {
+          await relaunch();
+        } catch (error) {
+          console.error("Failed to restart launcher:", error);
+          showByondNotification("", false, {
+            title: "BYOND installed!",
+            details: ["Please restart the launcher manually."],
+          });
+        }
+      }, 1_000);
     } else {
       showByondNotification(result.message, true);
       byondInstallButton.disabled = false;
