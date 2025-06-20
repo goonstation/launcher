@@ -30,7 +30,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/goonstation.ico"],
+    "icon": ["icons/launcher_logo.ico"],
     "publisher": "Goonstation",
     "createUpdaterArtifacts": true,
 
@@ -40,7 +40,7 @@
         "installMode": "both",
         "headerImage": "icons/installBanner.bmp",
         "sidebarImage": "icons/installSidebar.bmp",
-        "installerIcon": "icons/goonstation.ico"
+        "installerIcon": "icons/launcher_logo.ico"
       },
       "wix": null
     }
