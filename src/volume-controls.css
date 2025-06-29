@@ -1,0 +1,58 @@
+.volume-controls {
+  background-color: rgba(0, 0, 30, 0.95);
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid var(--button-border);
+  box-shadow: 0 0 0 1px #000066, inset 0 0 10px rgba(0, 200, 255, 0.3),
+    0 0 15px rgba(0, 200, 255, 0.5);
+  width: 180px;
+  position: fixed;
+  top: 6.25rem;
+  right: 1.5rem;
+  z-index: 15;
+  display: none;
+}
+
+.volume-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.volume-controls input[type="range"] {
+  appearance: none;
+  height: 5px;
+  background: #555;
+  border-radius: 5px;
+  margin: 0.5em 0;
+  width: 100%;
+  outline: none;
+}
+
+.volume-controls input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #00ccff;
+  border-radius: 50%;
+  transition: background 0.2s;
+  box-shadow: 0 0 5px rgba(0, 200, 255, 0.7);
+}
+
+.volume-controls input[type="range"]::-webkit-slider-thumb:hover {
+  background: #33daff;
+}
+
+.volume-skip-button {
+  height: 36px;
+}
+
+.volume-label {
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+}
+
+.volume-controls.visible {
+  display: block;
+}

@@ -65,6 +65,9 @@ async function handleSettingsSubmit(event: Event) {
   const byondVersionOverrideInput = document.querySelector<HTMLInputElement>(
     "#byond-version-override",
   );
+  const autoMuteCheckbox = document.querySelector<HTMLInputElement>(
+    "#auto-mute-ingame",
+  );
 
   // Validate inputs exist
   if (!byondPathInput || !launchMethodSelect || !byondVersionOverrideInput) {
@@ -73,11 +76,14 @@ async function handleSettingsSubmit(event: Event) {
   }
 
   try {
+    // Get auto-mute setting
+
     // Update settings
     const success = await updateSettings({
       byondPath: byondPathInput.value.trim(),
       launchMethod: launchMethodSelect.value as LaunchMethod,
       byondVersionOverride: byondVersionOverrideInput.value.trim() || null,
+      autoMuteInGame: autoMuteCheckbox ? autoMuteCheckbox.checked : true,
     });
 
     if (success) {
@@ -104,10 +110,14 @@ async function loadSettingsIntoForm() {
     const byondVersionOverrideInput = document.querySelector<HTMLInputElement>(
       "#byond-version-override",
     )!;
+    const autoMuteCheckbox = document.querySelector<HTMLInputElement>(
+      "#auto-mute-ingame",
+    )!;
 
     byondPathInput.value = settings.byondPath;
     launchMethodSelect.value = settings.launchMethod;
     byondVersionOverrideInput.value = settings.byondVersionOverride || "";
+    autoMuteCheckbox.checked = settings.autoMuteInGame;
 
     if (requiredVersion) {
       byondVersionOverrideInput.placeholder =

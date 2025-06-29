@@ -15,6 +15,8 @@ export interface UserSettings {
   byondPath: string;
   launchMethod: LaunchMethod;
   isMuted: boolean;
+  volume: number;
+  autoMuteInGame: boolean;
   byondVersionOverride: string | null;
   lastFetchedGithubVersion: {
     major: number;
@@ -26,6 +28,8 @@ const DEFAULT_SETTINGS: UserSettings = {
   byondPath: "C:\\Program Files (x86)\\BYOND",
   launchMethod: LaunchMethod.DREAM_SEEKER,
   isMuted: false,
+  volume: 0.5,
+  autoMuteInGame: true,
   byondVersionOverride: null,
   lastFetchedGithubVersion: null,
 };

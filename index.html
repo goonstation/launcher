@@ -20,8 +20,13 @@
       alt="Goonstation logo"
     />
 
-    <button id="mute-button" class="config-button mute-button">🔊</button>
-    <button id="settings-button" class="config-button settings-button">
+    <button id="mute-button" class="config-button glow-button mute-button">
+      🔊
+    </button>
+    <button
+      id="settings-button"
+      class="config-button glow-button settings-button"
+    >
       ⚙️
     </button>
 
@@ -131,12 +136,14 @@ For more details, refer to the GitHub repository.
       <form>
         <label for="byond-path">BYOND Installation Path:</label>
         <input type="text" id="byond-path" />
+
         <label for="byond-version-override">BYOND Version Override:</label>
         <input
           type="text"
           id="byond-version-override"
           placeholder="515.1637 (leave empty for recommended)"
         />
+
         <label for="byond-mode">Launch Method:</label>
         <select id="byond-mode">
           <option value="dreamseeker">
@@ -144,6 +151,14 @@ For more details, refer to the GitHub repository.
           </option>
           <option value="pager">BYOND Pager (BYOND Authentication)</option>
         </select>
+
+        <div>
+          <input type="checkbox" id="auto-mute-ingame" />
+          Mute music when joining a server
+        </div>
+
+        <br />
+
         <button type="submit" id="settings-submit">Save Settings</button>
         <span id="version">Version: Unknown</span>
       </form>

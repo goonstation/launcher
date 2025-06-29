@@ -2,6 +2,7 @@
 @import "./join-buttons.css";
 @import "./update-notification.css";
 @import "./byond-notification.css";
+@import "./volume-controls.css";
 
 .hidden {
   display: none;
@@ -55,35 +56,43 @@ button {
   border: 0.1rem solid var(--button-border);
   border-radius: 4px;
   background-color: rgba(0, 0, 30, 0.7);
-  box-shadow:
-    0 0 0 1px #000066,
-    inset 0 0 10px rgba(0, 200, 255, 0.3),
+  box-shadow: 0 0 0 1px #000066, inset 0 0 10px rgba(0, 200, 255, 0.3),
     0 0 15px rgba(0, 200, 255, 0.5);
   padding: 15px;
   margin-bottom: 20px;
 }
 
+/* Base button style for glow effect buttons */
+.glow-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: white;
+  background: linear-gradient(to bottom, #555, #151515);
+  border: 0.06rem solid #00ccff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 0.06rem #000066, inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
+    0 0 0.5rem rgba(0, 200, 255, 0.5);
+  text-shadow: 0 0 0.1rem var(--glow-color-blue);
+  transition: all 0.2s;
+}
+
+.glow-button:hover {
+  background: linear-gradient(to bottom, #666, #333);
+}
+
+.glow-button:active {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #444, #222);
+}
+
+/* Configuration buttons specific styling */
 .config-button {
   position: fixed;
   width: 2.5rem;
   height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 1.5em;
-  line-height: 0;
-  background: linear-gradient(to bottom, #555, #151515);
-  border: 0.06rem solid #00ccff;
-  border-radius: 0.25rem;
-  box-shadow:
-    0 0 0 0.06rem #000066,
-    inset 0 0 0.3rem rgba(0, 200, 255, 0.5),
-    0 0 0.5rem rgba(0, 200, 255, 0.5);
-  text-shadow: 0 0 0.2rem var(--glow-color-blue);
-}
-
-.config-button:hover {
-  background: linear-gradient(to bottom, #666, #333);
 }
 
 #mute-button {
@@ -126,16 +135,12 @@ button {
   color: white;
   margin-right: 10px;
   border: 1px solid var(--status-online);
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(0, 255, 0, 0.3),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
 }
 
 #refresh-button:hover {
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 10px rgba(0, 255, 0, 0.5),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(0, 255, 0, 0.5),
     0 0 15px rgba(0, 255, 0, 0.7);
 }
 
@@ -143,16 +148,12 @@ button {
   background: linear-gradient(to bottom, #660000, #330000);
   color: white;
   border: 1px solid var(--status-offline);
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(255, 0, 0, 0.3),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
 }
 
 #exit-button:hover {
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 10px rgba(255, 0, 0, 0.5),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(255, 0, 0, 0.5),
     0 0 15px rgba(255, 0, 0, 0.7);
 }
 
@@ -168,9 +169,7 @@ button {
   background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid #00ff00;
   border-radius: 0.3rem;
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(0, 255, 0, 0.3),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
   text-shadow: 0 0 3px rgba(0, 255, 0, 0.7);
 }
@@ -178,9 +177,7 @@ button {
 #notice-label.warning {
   color: #ffff00;
   border-color: #ffff00;
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(255, 255, 0, 0.3),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 255, 0, 0.3),
     0 0 8px rgba(255, 255, 0, 0.5);
   text-shadow: 0 0 3px rgba(255, 255, 0, 0.7);
 }
@@ -188,9 +185,7 @@ button {
 #notice-label.error {
   color: #ff0000;
   border-color: #ff0000;
-  box-shadow:
-    0 0 0 1px #000022,
-    inset 0 0 5px rgba(255, 0, 0, 0.3),
+  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
   text-shadow: 0 0 3px rgba(255, 0, 0, 0.7);
 }

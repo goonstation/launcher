@@ -5,6 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { ServerInfo } from "./serverService.ts";
 import { getSettings, LaunchMethod } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
+import { muteForGameplay, restoreAudioAfterGameplay } from "./audioService.ts";
 
 // Directly invoke Rust commands for Discord Rich Presence
 // async function setInGameActivity(serverName: string): Promise<void> {
@@ -35,6 +36,11 @@ export async function joinServer(
     const settings = await getSettings();
 
     setNoticeMessage(`Joining ${server.name}...`);
+
+    // Mute background music when joining a server if setting is enabled
+    if (settings.autoMuteInGame) {
+      muteForGameplay();
+    }
 
     console.log(
       `Joining server using ${settings.launchMethod} at ${settings.byondPath}`,
@@ -115,6 +121,7 @@ function startDreamSeekerMonitor(server: ServerInfo) {
         console.log("DreamSeeker process closed, updating Discord presence");
         await setLauncherActivity();
         setNoticeMessage("DreamSeeker closed, back to launcher.");
+        // This will also restore audio
         stopDreamSeekerMonitor();
       }
     } catch (err) {
@@ -131,5 +138,13 @@ export function stopDreamSeekerMonitor() {
     clearInterval(dreamSeekerMonitorInterval);
     dreamSeekerMonitorInterval = null;
     currentJoinedServer = null;
+
+    // Get current settings to check if we should restore audio
+    getSettings().then((settings) => {
+      // Only restore audio if auto-mute was enabled
+      if (settings.autoMuteInGame) {
+        restoreAudioAfterGameplay().catch(console.error);
+      }
+    });
   }
 }
