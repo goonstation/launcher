@@ -22,9 +22,7 @@ for checking server status and launching the game to connect to a server.
 Strive for simple, clean, and efficient code.
 
 Be terse with comments, don't add unnecessary ones if it's obvious what the code does.
-Don't add dumb useless comments describing the change you just made, as well.
-
-If you need to add a comment (unlikely), use single-line jsdoc comments unless they're multiline. For example, `/** foobar */`
+Don't add dumb useless comments describing the change you just made, as well. Only use inline jsdoc comments where necessary.
 
 Don't rerun the `deno task tauri dev` every time, I'm running it in the Do not
 use npm to install/uninstall. We use deno for package management. We install

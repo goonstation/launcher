@@ -10,8 +10,10 @@ import key_lime from "../assets/audio/key_lime.ogg";
 // DOM Elements
 let backgroundMusic: HTMLAudioElement;
 let muteButton: HTMLButtonElement;
-let volumeSlider: HTMLInputElement | null = null;
-let volumeContainer: HTMLDivElement | null = null;
+let volumeSlider: HTMLInputElement;
+let volumeContainer: HTMLDivElement;
+let volumeLabel: HTMLDivElement;
+let skipButton: HTMLButtonElement;
 
 // Audio state
 let isMuted = false; // User preference for mute
@@ -32,84 +34,51 @@ export async function initAudioService(
   backgroundMusic = musicElement;
   muteButton = muteElement;
 
-  try {
-    const settings = await getSettings();
-    isMuted = settings.isMuted ?? false;
-    volume = settings.volume ?? 0.5;
-  } catch (error) {
-    console.error("Error loading audio settings:", error);
-    // Default values if settings can't be loaded
-    isMuted = false;
-    volume = 0.5;
-  }
+  const settings = await getSettings();
+  isMuted = settings.isMuted ?? false;
+  volume = settings.volume ?? 0.5;
 
-  createVolumeControls();
+  initVolumeControls();
   updateAudioState();
   initAudio();
 }
 
-/** Create volume slider UI */
-function createVolumeControls() {
-  // Create volume container
-  volumeContainer = document.createElement("div");
-  volumeContainer.className = "volume-controls";
+/** Initialize volume controls from existing HTML */
+function initVolumeControls() {
+  // Get references to existing HTML elements
+  volumeContainer = document.getElementById(
+    "volume-controls",
+  ) as HTMLDivElement;
+  volumeSlider = document.getElementById("volume-slider") as HTMLInputElement;
+  volumeLabel = document.getElementById("volume-label") as HTMLDivElement;
+  skipButton = document.getElementById("skip-song-button") as HTMLButtonElement;
 
-  // Create wrapper for better organization
-  const controlsWrapper = document.createElement("div");
-  controlsWrapper.className = "volume-controls-wrapper";
-
-  // Create skip song button instead of mute button
-  const skipButton = document.createElement("button");
-  skipButton.className = "volume-skip-button glow-button";
-  skipButton.textContent = "⏭️ Skip Song";
-
-  skipButton.addEventListener("click", () => {
-    playNextTrack();
-  });
-
-  // Create volume slider
-  volumeSlider = document.createElement("input");
-  volumeSlider.type = "range";
-  volumeSlider.min = "0";
-  volumeSlider.max = "1";
-  volumeSlider.step = "0.01";
+  // Set initial volume from settings
   volumeSlider.value = (volume || 0.5).toString();
-  volumeSlider.className = "volume-slider";
+  volumeLabel.textContent = `Volume: ${Math.round((volume || 0.5) * 100)}%`;
 
+  // Set up event listeners
+  skipButton.addEventListener("click", playNextTrack);
   volumeSlider.addEventListener("input", handleVolumeChange);
 
-  // Add current volume label
-  const volumeLabel = document.createElement("div");
-  volumeLabel.textContent = `Volume: ${Math.round((volume || 0.5) * 100)}%`;
-  volumeLabel.className = "volume-label";
-
+  // Update volume label when slider changes
   volumeSlider.addEventListener("input", () => {
-    if (volumeSlider) {
-      const currentVol = parseFloat(volumeSlider.value);
-      volumeLabel.textContent = `Volume: ${Math.round(currentVol * 100)}%`;
-    }
+    const currentVol = parseFloat(volumeSlider.value);
+    volumeLabel.textContent = `Volume: ${Math.round(currentVol * 100)}%`;
   });
-
-  // Add elements to the container
-  controlsWrapper.appendChild(volumeSlider);
-  controlsWrapper.appendChild(volumeLabel);
-  controlsWrapper.appendChild(skipButton);
-  volumeContainer.appendChild(controlsWrapper);
-  document.body.appendChild(volumeContainer);
 
   // Setup click outside to close
   document.addEventListener("click", (event) => {
     if (
-      volumeContainer &&
-      volumeContainer.classList.contains("visible") &&
+      !volumeContainer.classList.contains("hidden") &&
       !volumeContainer.contains(event.target as Node) &&
       event.target !== muteButton
     ) {
-      volumeContainer.classList.remove("visible");
+      volumeContainer.classList.add("hidden");
     }
   });
 
-  // Setup mute button to only toggle volume controls visibility
+  // Setup mute button to toggle volume controls visibility
   muteButton.addEventListener("click", (e) => {
     toggleVolumeControls(e);
   });
@@ -118,9 +87,7 @@ function createVolumeControls() {
 /** Toggle volume controls visibility */
 function toggleVolumeControls(event: MouseEvent) {
   event.stopPropagation();
-  if (volumeContainer) {
-    volumeContainer.classList.toggle("visible");
-  }
+  volumeContainer.classList.toggle("hidden");
 }
 
 /** Update audio state and UI based on current volume and mute settings */
@@ -130,20 +97,12 @@ function updateAudioState() {
     volume = 0.5;
   }
 
-  // Update the UI - keep volume icon consistent since it's now just a control opener
-  if (muteButton) {
-    muteButton.textContent = "🎵"; // Always show volume icon since it's a control button
-    muteButton.title = "Volume Controls";
-  }
-
   // Update audio state - pause if volume is 0 or muted (legacy support)
   if (volume <= 0 || isMuted) {
-    if (backgroundMusic) {
-      backgroundMusic.pause();
-    }
+    backgroundMusic.pause();
   } else {
     // Only play if we have audio and it's currently paused
-    if (backgroundMusic && backgroundMusic.paused && backgroundMusic.src) {
+    if (backgroundMusic.paused && backgroundMusic.src) {
       backgroundMusic.play().catch((error) =>
         console.error("Error playing audio:", error)
       );
@@ -151,14 +110,11 @@ function updateAudioState() {
   }
 
   // Always set the physical volume (even when muted)
-  if (backgroundMusic) {
-    backgroundMusic.volume = volume;
-  }
+  backgroundMusic.volume = volume;
 
-  // Update the slider if it exists
-  if (volumeSlider) {
-    volumeSlider.value = volume.toString();
-  }
+  // Update the slider and label
+  volumeSlider.value = volume.toString();
+  volumeLabel.textContent = `Volume: ${Math.round(volume * 100)}%`;
 }
 
 /** Handle volume slider change */
@@ -190,7 +146,6 @@ function initAudio() {
   // Set initial volume from settings
   backgroundMusic.volume = volume;
 
-  // Set up track rotation
   backgroundMusic.addEventListener("ended", playNextTrack);
 
   // Set initial track (randomly selected)
@@ -203,7 +158,6 @@ function initAudio() {
 
 /** Toggle mute state (kept for compatibility with existing code) */
 export async function toggleMute() {
-  // Toggle the muted state
   isMuted = !isMuted;
 
   // Save mute state to settings
@@ -222,54 +176,34 @@ export async function toggleMute() {
 /** Temporarily mute for gameplay */
 export function muteForGameplay() {
   if (!isMuted && backgroundMusic && !backgroundMusic.paused) {
-    // Just set mute state without changing volume
     isMuted = true;
-
-    // Update state and UI
     updateAudioState();
-
     setNoticeMessage("🔇 Music muted for gameplay");
   }
 }
 
 /** Restore audio after gameplay if it was temporarily muted */
 export async function restoreAudioAfterGameplay() {
-  // Get current settings
   const settings = await getSettings();
 
-  // Only restore if we should be unmuted according to settings
   if (!settings.isMuted) {
     isMuted = false;
-
-    // Update state and UI
     updateAudioState();
-
     setNoticeMessage("🔊 Music restored after gameplay");
   }
 }
 
 /** Switch to the next track in the playlist */
 function playNextTrack() {
-  // Increment to the next track, looping back to the first one if needed
   currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-
-  // Update the audio source
   backgroundMusic.src = playlist[currentTrackIndex];
 
-  // Get track name for notification
   const trackName =
     playlist[currentTrackIndex].split("/").pop()?.replace(".ogg", "") ||
     "Unknown";
 
-  // Apply current audio state
   updateAudioState();
-
-  // Always show notification when skipping tracks, even if volume is low
-  // Only don't show if completely muted
-  if (volume > 0) {
-    setNoticeMessage(`🎵 Skipped to: ${trackName}`);
-  } else {
-    // If volume is 0, just update without playing
-    setNoticeMessage(`Track changed to: ${trackName} (volume is 0)`);
-  }
+  setNoticeMessage(
+    `🎵 Skipped to: ${trackName}${volume > 0 ? "" : " (volume 0)"}`,
+  );
 }

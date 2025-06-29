@@ -20,15 +20,41 @@
       alt="Goonstation logo"
     />
 
-    <button id="mute-button" class="config-button glow-button mute-button">
-      🔊
+    <button
+      id="mute-button"
+      class="config-button glow-button mute-button"
+      title="Volume Controls"
+    >
+      🎵
     </button>
     <button
       id="settings-button"
       class="config-button glow-button settings-button"
+      title="Settings"
     >
       ⚙️
     </button>
+
+    <div id="volume-controls" class="volume-controls hidden">
+      <div class="volume-controls-wrapper">
+        <input
+          type="range"
+          id="volume-slider"
+          class="volume-slider"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.5"
+        />
+        <div id="volume-label" class="volume-label">Volume: 50%</div>
+        <button
+          id="skip-song-button"
+          class="volume-skip-button glow-button"
+        >
+          ⏭️ Skip Song
+        </button>
+      </div>
+    </div>
 
     <div class="app-header retro-frame">
       <a
