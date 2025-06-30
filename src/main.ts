@@ -4,7 +4,6 @@ import {
   fetchServerStatus,
   startServerStatusRefresh,
 } from "./services/serverService.ts";
-import { getSettings } from "./services/settingsService.ts";
 import { initSettingsUIService } from "./services/settingsUIService.ts";
 import {
   createServerButtons,
@@ -47,11 +46,6 @@ function initApp() {
   initUpdateUIService();
   initByondUIService();
   initExternalLinkService();
-
-  // Initialize settings
-  getSettings().catch((error) => {
-    console.error("Error initializing settings:", error);
-  });
 
   // Initialize auto update check
   startupUpdateCheck();

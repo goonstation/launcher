@@ -140,7 +140,7 @@ async function cacheServerData(servers: ServerInfo[]): Promise<void> {
 
     // Save the server data
     await writeTextFile(cacheFilePath, JSON.stringify(servers));
-    console.log("Server data cached successfully");
+    console.debug("Server data cached successfully");
   } catch (error) {
     console.error("Error caching server data:", error);
   }
@@ -164,7 +164,7 @@ async function loadCachedServerData(): Promise<ServerInfo[] | null> {
     // Read and parse the cached data
     const cachedData = await readTextFile(cacheFilePath);
     const servers = JSON.parse(cachedData) as ServerInfo[];
-    console.log("Loaded cached server data");
+    console.debug("Loaded cached server data");
     return servers;
   } catch (error) {
     console.error("Error loading cached server data:", error);

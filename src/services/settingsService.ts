@@ -103,7 +103,7 @@ async function loadSettings(): Promise<UserSettings | null> {
       settings.launchMethod = DEFAULT_SETTINGS.launchMethod;
     }
 
-    console.log("Settings loaded successfully");
+    console.debug("Settings loaded successfully");
     return settings;
   } catch (error) {
     console.error("Error loading settings:", error);
