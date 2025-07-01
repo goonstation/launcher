@@ -7,6 +7,8 @@ import { getSettings, LaunchMethod } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
 import { muteForGameplay, restoreAudioAfterGameplay } from "./audioService.ts";
 
+type ProcessCheckFn = () => Promise<boolean>;
+
 // Directly invoke Rust commands for Discord Rich Presence
 // async function setInGameActivity(serverName: string): Promise<void> {
 //   try {
@@ -27,6 +29,10 @@ async function setLauncherActivity(): Promise<void> {
     console.error("Failed to set launcher activity:", err);
   }
 }
+
+let currentJoinedServer: ServerInfo | null = null;
+let dreamSeekerMonitorInterval: number | null = null;
+let wasProcessRunning = false;
 
 /** Join a server using the configured BYOND settings */
 export async function joinServer(
@@ -52,99 +58,152 @@ export async function joinServer(
     console.log(`Server link: ${byondUrl}`);
     if (settings.launchMethod === LaunchMethod.BYOND_PAGER) {
       await openUrl(byondUrl);
-      setNoticeMessage(`✅ Opened ${server.short_name} in BYOND pager`);
+      setNoticeMessage(`✅ Opened ${server.short_name} via BYOND pager`);
       // await setInGameActivity(server.name);
-      // Start monitoring for BYOND pager (though this might be less reliable)
-      startDreamSeekerMonitor(server);
+
+      startByondPagerMonitor(server);
     } else if (settings.launchMethod === LaunchMethod.DREAM_SEEKER) {
-      // Launch DreamSeeker directly with the server address using Rust function
-      try {
-        console.log(
-          `Launching DreamSeeker from ${settings.byondPath} with address ${serverAddress}`,
-        );
-
-        // Call the Rust function to launch DreamSeeker
-        const result = await invoke("launch_dreamseeker", {
-          byondPath: settings.byondPath,
-          serverAddress: serverAddress,
-        });
-
-        console.log("DreamSeeker launch result:", result);
-        setNoticeMessage(`✅ Started DreamSeeker for ${server.short_name}`);
-        // await setInGameActivity(server.name);
-
-        // Start monitoring DreamSeeker process
-        startDreamSeekerMonitor(server);
-      } catch (execError) {
-        console.error("Error launching DreamSeeker:", execError);
-        setNoticeMessage(
-          `❌ Failed to launch DreamSeeker: ${
-            execError instanceof Error ? execError.message : String(execError)
-          }`,
-          true,
-        );
-      }
-    } else {
-      // For other methods (to be implemented)
-      setNoticeMessage(
-        `🚀 Joining ${server.short_name} via ${settings.launchMethod}`,
+      console.log(
+        `Launching DreamSeeker from ${settings.byondPath} with address ${serverAddress}`,
       );
-      setTimeout(() => {
-        setNoticeMessage(
-          `✅ Started ${settings.launchMethod} for ${server.short_name}`,
-        );
-      }, 2000);
+
+      const result = await invoke("launch_dreamseeker", {
+        byondPath: settings.byondPath,
+        serverAddress: serverAddress,
+      });
+
+      console.log("DreamSeeker launch result:", result);
+      setNoticeMessage(`✅ Started DreamSeeker for ${server.short_name}`);
+      // await setInGameActivity(server.name);
+
+      startDreamSeekerMonitor(server);
+    } else {
+      setNoticeMessage(
+        `❌❌ NOT IMPLEMENTED: ${settings.launchMethod} method ❌❌`,
+      );
     }
   } catch (error) {
     console.error("Error joining server:", error);
-    setNoticeMessage("❌ Error joining server", true);
+    setNoticeMessage(`❌ Error joining server: ${error}`, true);
   }
 }
 
-// Store the current server and monitoring interval
-let currentJoinedServer: ServerInfo | null = null;
-let dreamSeekerMonitorInterval: number | null = null;
+/**
+ * Core monitoring function that handles process tracking
+ * Works with different process detection methods
+ */
+function monitorProcess(
+  server: ServerInfo,
+  checkFn: ProcessCheckFn,
+  checkInterval: number = 5000,
+  requirePreviouslyRunning: boolean = false,
+) {
+  console.log(`Starting process monitor for ${server.name}`);
 
-/** Start monitoring DreamSeeker process status */
-function startDreamSeekerMonitor(server: ServerInfo) {
+  // Store current server
   currentJoinedServer = server;
 
   // Clear any existing monitor
   stopDreamSeekerMonitor();
 
-  // Check every 5 seconds if DreamSeeker is still running
+  // Check immediately to establish initial state if needed
+  if (requirePreviouslyRunning) {
+    checkFn().then((isRunning) => {
+      console.log(`Initial process check: ${isRunning}`);
+      wasProcessRunning = isRunning;
+    });
+  }
+
+  // Start the interval check
   dreamSeekerMonitorInterval = setInterval(async () => {
     try {
-      const isRunning = await invoke<boolean>("is_dreamseeker_running");
+      const isRunning = await checkFn();
+      console.log(`Process check: ${isRunning}`);
 
-      if (!isRunning && currentJoinedServer) {
-        console.log("DreamSeeker process closed, updating Discord presence");
-        await setLauncherActivity();
-        setNoticeMessage("DreamSeeker closed, back to launcher.");
-        // This will also restore audio
-        stopDreamSeekerMonitor();
+      // Different handling based on configuration
+      if (requirePreviouslyRunning) {
+        // Only act when we detect the process was running but now isn't
+        if (wasProcessRunning && !isRunning && currentJoinedServer) {
+          console.log("Process closed, updating Discord presence");
+          await handleProcessExit();
+        }
+        // Update the state for next check
+        wasProcessRunning = isRunning;
+      } else {
+        // Simpler case - just check if it's not running now
+        if (!isRunning && currentJoinedServer) {
+          console.log("Process closed, updating Discord presence");
+          await handleProcessExit();
+        }
       }
     } catch (err) {
-      console.error("Error checking DreamSeeker status:", err);
+      console.error("Error checking process status:", err);
     }
-  }, 5000);
+  }, checkInterval);
 
-  console.log(`Started monitoring DreamSeeker for ${server.name}`);
+  console.log(`Started monitoring for ${server.name}`);
 }
 
-/** Stop monitoring DreamSeeker process status */
+/**
+ * Common handling for process exit event
+ */
+async function handleProcessExit() {
+  await setLauncherActivity();
+  setNoticeMessage("DreamSeeker closed, back to launcher.");
+  stopDreamSeekerMonitor();
+}
+
+/**
+ * Start monitoring DreamSeeker process when launched directly
+ */
+function startDreamSeekerMonitor(server: ServerInfo) {
+  // Use the core monitoring function with the direct child process check
+  monitorProcess(
+    server,
+    () => invoke<boolean>("is_dreamseeker_running"),
+    4000,
+    false,
+  );
+}
+
+/**
+ * Start monitoring for DreamSeeker when launched via BYOND pager
+ */
+export function startByondPagerMonitor(server: ServerInfo) {
+  // Use the core monitoring function with the system-wide process check
+  // and detection of process state changes
+  monitorProcess(
+    server,
+    () => invoke<boolean>("find_dreamseeker_process"),
+    4000,
+    true,
+  );
+}
+
+/** Stop monitoring any DreamSeeker process */
 export function stopDreamSeekerMonitor() {
+  console.log("Stopping process monitor");
+
   if (dreamSeekerMonitorInterval !== null) {
     clearInterval(dreamSeekerMonitorInterval);
     dreamSeekerMonitorInterval = null;
-    currentJoinedServer = null;
 
-    // Get current settings to check if we should restore audio
-    getSettings().then((settings) => {
-      // Only restore audio if auto-mute was enabled
-      if (settings.autoMuteInGame) {
-        restoreAudioAfterGameplay().catch(console.error);
-      }
-    });
+    const server = currentJoinedServer?.name || "unknown";
+    console.log(`Cleared monitor interval for server: ${server}`);
+
+    if (currentJoinedServer !== null) {
+      getSettings().then((settings) => {
+        if (settings.autoMuteInGame) {
+          console.log("Auto-mute was enabled, restoring audio");
+          restoreAudioAfterGameplay().catch(console.error);
+        } else {
+          console.log("Auto-mute was disabled, not restoring audio");
+        }
+      });
+    }
+
+    // Reset state variables
+    currentJoinedServer = null;
+    wasProcessRunning = false;
   }
 }
