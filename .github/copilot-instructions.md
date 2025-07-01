@@ -21,12 +21,13 @@ for checking server status and launching the game to connect to a server.
 
 Strive for simple, clean, and efficient code.
 
-Be terse with comments, don't add unnecessary ones if it's obvious what the code does.
-Don't add dumb useless comments describing the change you just made, as well. Only use inline jsdoc comments where necessary.
+Be terse with comments, don't add unnecessary ones if it's obvious what the code
+does. Don't add dumb useless comments describing the change you just made, as
+well. Only use inline jsdoc comments where necessary.
 
 Don't rerun the `deno task tauri dev` every time, I'm running it in the Do not
 use npm to install/uninstall. We use deno for package management. We install
 using deno, for example `deno install npm:@tauri-apps/plugin-shell`
 
-We are only targeting webview2 and webkit, since this is made with Tauri.
-Don't give a bunch of summary of changes.
+We are only targeting webview2 and webkit, since this is made with Tauri. Don't
+give a bunch of summary of changes.
