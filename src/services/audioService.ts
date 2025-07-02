@@ -199,11 +199,14 @@ function playNextTrack() {
   backgroundMusic.src = playlist[currentTrackIndex];
 
   const trackName =
-    playlist[currentTrackIndex].split("/").pop()?.replace(".ogg", "") ||
+    playlist[currentTrackIndex].split("/").pop()?.split("-")[0]?.replace(
+      ".ogg",
+      "",
+    ) ||
     "Unknown";
 
   updateAudioState();
   setNoticeMessage(
-    `🎵 Skipped to: ${trackName}${volume > 0 ? "" : " (volume 0)"}`,
+    `🎵 Now Playing: ${trackName}${volume > 0 ? "" : " (volume 0)"}`,
   );
 }
