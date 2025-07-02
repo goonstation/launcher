@@ -6,6 +6,7 @@ import {
   LaunchMethod,
   updateSettings,
 } from "./settingsService.ts";
+import { fetchServerStatus } from "./serverService.ts";
 import { setNoticeMessage } from "./uiService.ts";
 import packageInfo from "../../package.json" with { type: "json" };
 
@@ -68,27 +69,33 @@ async function handleSettingsSubmit(event: Event) {
   const autoMuteCheckbox = document.querySelector<HTMLInputElement>(
     "#auto-mute-ingame",
   );
+  const showInvisibleServersCheckbox = document.querySelector<HTMLInputElement>(
+    "#show-invisible-servers",
+  );
 
   // Validate inputs exist
-  if (!byondPathInput || !launchMethodSelect || !byondVersionOverrideInput) {
+
+  if (
+    !byondPathInput || !launchMethodSelect || !byondVersionOverrideInput ||
+    !showInvisibleServersCheckbox
+  ) {
     console.error("Form inputs not found");
     return;
   }
 
   try {
-    // Get auto-mute setting
-
-    // Update settings
     const success = await updateSettings({
       byondPath: byondPathInput.value.trim(),
       launchMethod: launchMethodSelect.value as LaunchMethod,
       byondVersionOverride: byondVersionOverrideInput.value.trim() || null,
       autoMuteInGame: autoMuteCheckbox ? autoMuteCheckbox.checked : true,
+      showInvisibleServers: showInvisibleServersCheckbox.checked,
     });
 
     if (success) {
       setNoticeMessage("✅ settings saved successfully");
       toggleSettingsModal(false);
+      fetchServerStatus(); // trigger an update
     }
   } catch (error) {
     console.error("error saving settings:", error);
@@ -113,11 +120,18 @@ async function loadSettingsIntoForm() {
     const autoMuteCheckbox = document.querySelector<HTMLInputElement>(
       "#auto-mute-ingame",
     )!;
+    const showInvisibleCheckbox = document.querySelector<
+      HTMLInputElement
+    >(
+      "#show-invisible-servers",
+    )!;
 
     byondPathInput.value = settings.byondPath;
     launchMethodSelect.value = settings.launchMethod;
     byondVersionOverrideInput.value = settings.byondVersionOverride || "";
     autoMuteCheckbox.checked = settings.autoMuteInGame;
+    showInvisibleCheckbox.checked = settings.showInvisibleServers ??
+      false;
 
     if (requiredVersion) {
       byondVersionOverrideInput.placeholder =

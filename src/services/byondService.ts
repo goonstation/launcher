@@ -291,7 +291,7 @@ export async function hasRequiredVersionChanged(
  * Check and clear BYOND version override if the github version changed.
  * This ensures the override gets reset every time the recommended version changes.
  */
-export async function checkAndClearOverrideIfNeeded(): Promise<void> {
+export async function checkByondVersionAndReset(): Promise<void> {
   try {
     // Fetch fresh version from github
     const response = await fetch(BYOND_CONFIG_URL);

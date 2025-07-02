@@ -68,47 +68,49 @@ export function updateStatusNotice(
 }
 
 /** Create buttons for each server */
-export function createServerButtons(servers: ServerInfo[]) {
-  // Clear existing buttons
+export async function createServerButtons(servers: ServerInfo[]) {
   serverButtonsContainer.innerHTML = "";
-
-  const sortedServers = getSortedServers(servers);
-
-  // Create buttons for each server
+  const sortedServers = await getSortedServers(servers);
   sortedServers.forEach((server) => {
     const button = document.createElement("button");
     button.className = "server-button styled";
-
-    // Add separate lines via spans
     const line1 = document.createElement("span");
     line1.style.display = "block";
-    line1.textContent = server.short_name;
-
+    const nameMatch = server.name.match(/^(.+?):\s*(.+)$/);
+    let cleanShortName = server.short_name.replace(/goon/i, "").trim();
+    if (server.id == 1 || server.id == 2) {
+      cleanShortName += " Classic";
+    }
+    if (nameMatch && nameMatch[2]) {
+      line1.textContent = "";
+      const nicknameSpan = document.createElement("span");
+      nicknameSpan.textContent = nameMatch[2] + " ";
+      line1.appendChild(nicknameSpan);
+      const shortNameSpan = document.createElement("span");
+      shortNameSpan.textContent = `(${cleanShortName})`;
+      shortNameSpan.style.fontSize = "0.9em";
+      line1.appendChild(shortNameSpan);
+    } else {
+      line1.textContent = cleanShortName;
+    }
     const line2 = document.createElement("span");
     line2.style.display = "block";
-    line2.textContent = server.current_map;
-
+    line2.textContent = `${server.current_map}`;
     const line3 = document.createElement("span");
     line3.style.display = "block";
-    line3.textContent = `${server.player_count} online`;
-
+    line3.textContent = `${server.player_count} players`;
     button.appendChild(line1);
     button.appendChild(line2);
     button.appendChild(line3);
-
-    // Add status indicator to the button
     const serverOnline = isServerOnline(server);
     button.classList.add(serverOnline ? "server-online" : "server-offline");
-
     button.addEventListener("click", () => {
-      // Only allow joining online servers
       if (serverOnline) {
         joinServer(server);
       } else {
         setNoticeMessage(`❌ ${server.name} is currently offline.`);
       }
     });
-
     serverButtonsContainer.appendChild(button);
   });
 }

@@ -2,6 +2,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { initAudioService } from "./services/audioService.ts";
 import {
   fetchServerStatus,
+  ServerDataState,
   startServerStatusRefresh,
 } from "./services/serverService.ts";
 import { initSettingsUIService } from "./services/settingsUIService.ts";
@@ -17,7 +18,7 @@ import {
   checkAndShowByondStatus,
   initByondUIService,
 } from "./services/byondUIService.ts";
-import { checkAndClearOverrideIfNeeded } from "./services/byondService.ts";
+import { checkByondVersionAndReset } from "./services/byondService.ts";
 import { initExternalLinkService } from "./services/externalLinkService.ts";
 
 function initApp() {
@@ -54,11 +55,11 @@ function initApp() {
   checkAndShowByondStatus();
 
   // Check if BYOND version in Github has changed and reset any override
-  checkAndClearOverrideIfNeeded();
+  checkByondVersionAndReset();
 
   // Setup periodic check for BYOND version changes (every 30 minutes)
   setInterval(() => {
-    checkAndClearOverrideIfNeeded();
+    checkByondVersionAndReset();
   }, 30 * 60 * 1000); // 30 minutes
 
   // Set up button event listeners for refresh and exit
@@ -69,17 +70,12 @@ function initApp() {
     await getCurrentWindow().close();
   });
 
-  // Listen for server status updates
   document.addEventListener(
     "server-status-update",
     ((event: CustomEvent) => {
       const { state, servers, error } = event.detail;
-
-      // Update UI based on the server state
       updateStatusNotice(state, error);
-
-      // Only update the server buttons if we have data
-      if (servers?.length > 0) {
+      if (servers?.length > 0 && state !== ServerDataState.REFRESHING) {
         createServerButtons(servers);
       }
     }) as EventListener,

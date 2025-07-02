@@ -22,6 +22,7 @@ export interface UserSettings {
     major: number;
     minor: number;
   } | null;
+  showInvisibleServers: boolean;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -32,6 +33,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   autoMuteInGame: true,
   byondVersionOverride: null,
   lastFetchedGithubVersion: null,
+  showInvisibleServers: false,
 };
 const SETTINGS_FILENAME = "user_settings.json";
 

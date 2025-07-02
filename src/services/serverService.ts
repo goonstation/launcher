@@ -7,6 +7,7 @@ import {
 } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
 import packageInfo from "../../package.json" with { type: "json" };
+import { getSettings } from "./settingsService.ts";
 
 interface ApiResponse {
   data: ServerInfo[];
@@ -280,15 +281,16 @@ export function isServerOnline(server: ServerInfo): boolean {
 /**
  * Sort servers by visibility and ID
  */
-export function getSortedServers(servers: ServerInfo[]): ServerInfo[] {
-  // Remove invisible servers
-  const visibleServers = servers.filter((s) => s.invisible !== true);
+export async function getSortedServers(
+  servers: ServerInfo[],
+): Promise<ServerInfo[]> {
+  const settings = await getSettings();
+  let filteredServers = servers;
+  if (!settings.showInvisibleServers) {
+    filteredServers = servers.filter((s) => s.invisible !== true);
+  }
   // Remove inactive servers
-  const activeServers = visibleServers.filter((s) => s.active === true);
-
-  // Sort both arrays by ID
-  const sortedVisibleServers = activeServers.sort((a, b) => a.id - b.id);
-
-  // Combine both arrays, with visible servers first
-  return sortedVisibleServers;
+  const activeServers = filteredServers.filter((s) => s.active === true);
+  // Sort by ID
+  return activeServers.sort((a, b) => a.id - b.id);
 }
