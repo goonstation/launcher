@@ -104,6 +104,9 @@ export async function createServerButtons(servers: ServerInfo[]) {
     button.appendChild(line3);
     const serverOnline = isServerOnline(server);
     button.classList.add(serverOnline ? "server-online" : "server-offline");
+    if (server.invisible) {
+      button.classList.add("server-invisible");
+    }
     button.addEventListener("click", () => {
       if (serverOnline) {
         joinServer(server);

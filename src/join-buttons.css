@@ -40,6 +40,10 @@
   cursor: not-allowed;
 }
 
+.server-button.server-invisible {
+  border: 1px dashed var(--status-online);
+}
+
 .server-online::before,
 .server-offline::before {
   content: "";
