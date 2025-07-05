@@ -23,19 +23,25 @@
 .server-button.server-online {
   background: linear-gradient(to bottom, #006633, #003311);
   border: 1px solid var(--status-online);
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(0, 255, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(0, 255, 0, 0.3),
     0 0 8px rgba(0, 255, 0, 0.5);
 }
 
 .server-online:hover {
-  box-shadow: 0 0 0 1px #000022, inset 0 0 10px rgba(0, 255, 0, 0.5),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 10px rgba(0, 255, 0, 0.5),
     0 0 15px rgba(0, 255, 0, 0.7);
 }
 
 .server-button.server-offline {
   background: linear-gradient(to bottom, #660000, #330000);
   border: 1px solid var(--status-offline);
-  box-shadow: 0 0 0 1px #000022, inset 0 0 5px rgba(255, 0, 0, 0.3),
+  box-shadow:
+    0 0 0 1px #000022,
+    inset 0 0 5px rgba(255, 0, 0, 0.3),
     0 0 8px rgba(255, 0, 0, 0.5);
   cursor: not-allowed;
 }
