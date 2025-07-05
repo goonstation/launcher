@@ -1,0 +1,55 @@
+name: Bug report
+description: File a bug report
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Thanks for helping improve the Goonstation Launcher!**
+        Please fill out the form below as completely as possible.
+  - type: input
+    id: title
+    attributes:
+      label: Short summary
+      description: Briefly describe the bug
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce the bug?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App Version
+      description: What version of the launcher are you using?
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: Windows, Linux, macOS, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs/screenshots
+      description: Paste logs or screenshots if available
+    validations:
+      required: false
