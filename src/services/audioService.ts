@@ -4,8 +4,12 @@ import { getSettings, updateSettings } from "./settingsService.ts";
 import { setNoticeMessage } from "./uiService.ts";
 
 import after_party from "../assets/audio/after_party.ogg";
+import atlas from "../assets/audio/atlas.ogg";
 import distant_star from "../assets/audio/distant_star.ogg";
 import key_lime from "../assets/audio/key_lime.ogg";
+import oh_no_evil_star from "../assets/audio/oh_no_evil_star.ogg";
+import planets from "../assets/audio/planets.ogg";
+import waystations from "../assets/audio/waystations.ogg";
 
 // DOM Elements
 let backgroundMusic: HTMLAudioElement;
@@ -21,9 +25,13 @@ let volume = 0.5; // Current volume level
 
 // Playlist configuration
 const playlist = [
+  atlas,
   after_party,
   distant_star,
   key_lime,
+  oh_no_evil_star,
+  planets,
+  waystations,
 ];
 let currentTrackIndex = 0;
 
