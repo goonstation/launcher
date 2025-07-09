@@ -49,3 +49,5 @@ Update the versions in:
 - cargo.toml
 
 push to release branch
+
+After, [submit to Microsoft manually](https://www.microsoft.com/en-us/wdsi/filesubmission).
