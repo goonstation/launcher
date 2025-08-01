@@ -27,7 +27,7 @@ export interface UserSettings {
 
 const DEFAULT_SETTINGS: UserSettings = {
   byondPath: "C:\\Program Files (x86)\\BYOND",
-  launchMethod: LaunchMethod.DREAM_SEEKER,
+  launchMethod: LaunchMethod.BYOND_PAGER,
   isMuted: false,
   volume: 0.5,
   autoMuteInGame: true,
