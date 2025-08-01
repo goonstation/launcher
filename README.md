@@ -50,4 +50,5 @@ Update the versions in:
 
 push to release branch
 
-After, [submit to Microsoft manually](https://www.microsoft.com/en-us/wdsi/filesubmission).
+After,
+[submit to Microsoft manually](https://www.microsoft.com/en-us/wdsi/filesubmission).
