@@ -50,7 +50,7 @@ pub fn get_byond_version(byond_path: &str) -> Result<ByondVersion, String> {
   let output = cmd
     .arg("-version")
     .output()
-    .map_err(|e| format!("Failed to execute dd.exe: {}", e))?;
+    .map_err(|e| format!("Failed to execute dd.exe: {e}"))?;
 
   if !output.status.success() {
     return Err(format!("dd.exe failed with status: {}", output.status));
@@ -75,15 +75,15 @@ fn parse_byond_version(output: &str) -> Result<ByondVersion, String> {
 
         let parts: Vec<&str> = version_str.split('.').collect();
         if parts.len() != 2 {
-          return Err(format!("Invalid version format: {}", version_str));
+          return Err(format!("Invalid version format: {version_str}"));
         }
 
         let major = parts[0]
           .parse::<u32>()
-          .map_err(|e| format!("Failed to parse major version: {}", e))?;
+          .map_err(|e| format!("Failed to parse major version: {e}"))?;
         let minor = parts[1]
           .parse::<u32>()
-          .map_err(|e| format!("Failed to parse minor version: {}", e))?;
+          .map_err(|e| format!("Failed to parse minor version: {e}"))?;
 
         return Ok(ByondVersion { major, minor });
       }
@@ -104,54 +104,45 @@ pub async fn download_byond_installer(
   let app_data_dir = app_handle
     .path()
     .app_data_dir()
-    .map_err(|e| format!("Failed to get app data directory: {}", e))?;
+    .map_err(|e| format!("Failed to get app data directory: {e}"))?;
   let download_dir = app_data_dir.join("byond_installer");
 
   // Create the download directory if it doesn't exist
   if !download_dir.exists() {
     fs::create_dir_all(&download_dir)
-      .map_err(|e| format!("Failed to create download directory: {}", e))?;
+      .map_err(|e| format!("Failed to create download directory: {e}"))?;
   }
 
-  let installer_filename = format!("byond_{}.{}_byond.exe", major, minor);
+  let installer_filename = format!("byond_{major}.{minor}_byond.exe");
   let installer_path = download_dir.join(&installer_filename);
 
   // Try primary download URL
-  let primary_url = format!(
-    "https://www.byond.com/download/build/{}/{}.{}_byond.exe",
-    major, major, minor
-  );
+  let primary_url =
+    format!("https://www.byond.com/download/build/{major}/{major}.{minor}_byond.exe");
   let client = reqwest::Client::new();
 
   match download_file(&primary_url, &installer_path, &client).await {
     Ok(_) => Ok(DownloadResult {
       success: true,
-      message: format!(
-        "Successfully downloaded BYOND {}.{} installer",
-        major, minor
-      ),
+      message: format!("Successfully downloaded BYOND {major}.{minor} installer"),
       installer_path: installer_path.to_string_lossy().to_string(),
     }),
     Err(primary_error) => {
-      println!("Failed to download from primary URL: {}", primary_error);
+      println!("Failed to download from primary URL: {primary_error}");
 
-      let backup_url = format!(
-        "https://spacestation13.github.io/byond-builds/{}/{}.{}_byond.exe",
-        major, major, minor
-      );
+      let backup_url =
+        format!("https://spacestation13.github.io/byond-builds/{major}/{major}.{minor}_byond.exe");
 
       match download_file(&backup_url, &installer_path, &client).await {
         Ok(_) => Ok(DownloadResult {
           success: true,
           message: format!(
-            "Successfully downloaded BYOND {}.{} installer from backup source",
-            major, minor
+            "Successfully downloaded BYOND {major}.{minor} installer from backup source"
           ),
           installer_path: installer_path.to_string_lossy().to_string(),
         }),
         Err(backup_error) => Err(format!(
-          "Failed to download BYOND installer from both sources. Primary error: {}, Backup error: {}",
-          primary_error, backup_error
+          "Failed to download BYOND installer from both sources. Primary error: {primary_error}, Backup error: {backup_error}",
         )),
       }
     }
@@ -165,7 +156,7 @@ async fn download_file(url: &str, path: &Path, client: &reqwest::Client) -> Resu
     .timeout(time::Duration::from_secs(6))
     .send()
     .await
-    .map_err(|e| format!("Failed to send request: {}", e))?;
+    .map_err(|e| format!("Failed to send request: {e}"))?;
 
   if !response.status().is_success() {
     return Err(format!(
@@ -178,14 +169,14 @@ async fn download_file(url: &str, path: &Path, client: &reqwest::Client) -> Resu
   let bytes = response
     .bytes()
     .await
-    .map_err(|e| format!("Failed to get response bytes: {}", e))?;
+    .map_err(|e| format!("Failed to get response bytes: {e}"))?;
 
   // Write to file
-  let mut file = File::create(path).map_err(|e| format!("Failed to create file: {}", e))?;
+  let mut file = File::create(path).map_err(|e| format!("Failed to create file: {e}"))?;
 
   file
     .write_all(&bytes)
-    .map_err(|e| format!("Failed to write file: {}", e))?;
+    .map_err(|e| format!("Failed to write file: {e}"))?;
 
   Ok(())
 }
@@ -201,7 +192,7 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
 
   Command::new(path)
     .output()
-    .map_err(|e| format!("Failed to execute installer: {}", e))?;
+    .map_err(|e| format!("Failed to execute installer: {e}"))?;
 
   // Verify installation by checking default path and registry
   let byond_path = r"C:\Program Files (x86)\BYOND";
@@ -214,7 +205,7 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
   if path_exists || regkey.is_ok() {
     Ok(InstallResult {
       success: true,
-      message: format!("BYOND installed successfully at {}", byond_path),
+      message: format!("BYOND installed successfully at {byond_path}"),
     })
   } else {
     // Neither path nor registry key found - installation likely failed (or weird custom dir)

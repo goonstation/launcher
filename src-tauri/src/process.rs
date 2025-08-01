@@ -21,10 +21,7 @@ pub fn launch_dreamseeker(byond_path: &str, server_address: &str) -> Result<Stri
   path.push("bin");
   path.push("dreamseeker.exe");
 
-  println!(
-    "Launching DreamSeeker at: {:?} with address {}",
-    path, server_address
-  );
+  println!("Launching DreamSeeker at: {path:?} with address {server_address}");
 
   if !path.exists() {
     return Err(format!(
@@ -42,9 +39,9 @@ pub fn launch_dreamseeker(byond_path: &str, server_address: &str) -> Result<Stri
         .lock()
         .unwrap()
         .replace(child);
-      Ok(format!("Started DreamSeeker for {}", server_address))
+      Ok(format!("Started DreamSeeker for {server_address}"))
     }
-    Err(e) => Err(format!("Failed to launch DreamSeeker: {}", e)),
+    Err(e) => Err(format!("Failed to launch DreamSeeker: {e}")),
   }
 }
 
@@ -60,16 +57,16 @@ pub fn is_dreamseeker_running() -> bool {
 
       match child.try_wait() {
         Ok(Some(status)) => {
-          println!("DreamSeeker process exited with status: {:?}", status);
+          println!("DreamSeeker process exited with status: {status:?}");
           *process_guard = None;
           false
         }
         Ok(None) => {
-          println!("DreamSeeker process with PID {} is still running", pid);
+          println!("DreamSeeker process with PID {pid} is still running");
           true
         }
         Err(e) => {
-          println!("Error checking DreamSeeker process: {}", e);
+          println!("Error checking DreamSeeker process: {e}");
           *process_guard = None;
           false
         }
