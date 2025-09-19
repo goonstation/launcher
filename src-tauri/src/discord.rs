@@ -65,22 +65,19 @@ fn set_discord_activity(state: &str, details: &str) -> Result<(), String> {
 
   // Client doesn't exist or reconnection failed, create a new one
   if client_guard.is_none() {
-    match DiscordIpcClient::new(APPLICATION_ID) {
-      Ok(mut client) => {
-        if let Err(e) = client.connect() {
-          return Err(format!("Failed to connect to Discord: {e}"));
-        }
+    let mut client = DiscordIpcClient::new(APPLICATION_ID);
 
-        let payload = create_activity_payload(state, details);
-        if let Err(e) = client.set_activity(payload) {
-          return Err(format!("Failed to set activity: {e}"));
-        }
-
-        *client_guard = Some(client);
-        Ok(())
-      }
-      Err(e) => Err(format!("Failed to create Discord client: {e}")),
+    if let Err(e) = client.connect() {
+      return Err(format!("Failed to connect to Discord: {e}"));
     }
+
+    let payload = create_activity_payload(state, details);
+    if let Err(e) = client.set_activity(payload) {
+      return Err(format!("Failed to set activity: {e}"));
+    }
+
+    *client_guard = Some(client);
+    Ok(())
   } else {
     // Should never reach here since we handle reconnection above
     Err("Failed to set Discord activity".to_string())
