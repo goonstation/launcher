@@ -5,6 +5,7 @@ import {
   getSortedServers,
   isServerOnline,
   ServerDataState,
+  ServerGroup,
   ServerInfo,
 } from "./serverService.ts";
 
@@ -74,6 +75,15 @@ export async function createServerButtons(servers: ServerInfo[]) {
   sortedServers.forEach((server) => {
     const button = document.createElement("button");
     button.className = "server-button styled";
+
+    // Add tomato emoji for servers with group_id 2
+    if (server.group_id === ServerGroup.TOMATO) {
+      const tomatoEmoji = document.createElement("div");
+      tomatoEmoji.textContent = "🍅";
+      tomatoEmoji.className = "tomato-indicator";
+      button.appendChild(tomatoEmoji);
+    }
+
     const line1 = document.createElement("span");
     line1.style.display = "block";
     const nameMatch = server.name.match(/^(.+?):\s*(.+)$/);

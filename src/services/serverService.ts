@@ -47,6 +47,12 @@ export interface ServerInfo {
   player_count: number;
   current_round_id: number;
   current_map: string;
+  group_id: ServerGroup;
+}
+
+export enum ServerGroup {
+  DEFAULT = 1,
+  TOMATO = 2,
 }
 
 export enum ServerDataState {
@@ -287,7 +293,11 @@ export async function getSortedServers(
   const settings = await getSettings();
   let filteredServers = servers;
   if (!settings.showInvisibleServers) {
-    filteredServers = servers.filter((s) => s.invisible !== true);
+    filteredServers = servers.filter((s) =>
+      s.invisible !== true ||
+      // Always include tomato servers, as long as they're active
+      (s.group_id === ServerGroup.TOMATO && s.active === true)
+    );
   }
   // Remove inactive servers
   const activeServers = filteredServers.filter((s) => s.active === true);
