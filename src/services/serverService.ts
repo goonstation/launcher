@@ -65,7 +65,7 @@ export enum ServerDataState {
 
 let currentState = ServerDataState.LOADING;
 let refreshInterval: number | null = null;
-const REFRESH_INTERVAL_MS = 30_000; // 30 seconds
+const REFRESH_INTERVAL_MS = 45_000; // 45 seconds
 
 /**
  * Get current server data state
