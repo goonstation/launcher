@@ -194,42 +194,58 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
     .output()
     .map_err(|e| format!("Failed to execute installer: {e}"))?;
 
-  // check HKLM
-  let read_install_path = || {
-    winreg::RegKey::predef(winreg::enums::HKEY_LOCAL_MACHINE)
-      .open_subkey(r"SOFTWARE\WOW6432Node\Dantom\BYOND")
-      .ok()
-      .and_then(|key| key.get_value::<String, _>("installpath").ok())
-      .filter(|path| !path.is_empty())
+  #[cfg(windows)]
+  let detected_path = {
+    let read_install_path = || {
+      winreg::RegKey::predef(winreg::enums::HKEY_LOCAL_MACHINE)
+        .open_subkey(r"SOFTWARE\WOW6432Node\Dantom\BYOND")
+        .ok()
+        .and_then(|key| key.get_value::<String, _>("installpath").ok())
+        .filter(|path| !path.is_empty())
+    };
+
+    let read_install_path_from_command = || {
+      winreg::RegKey::predef(winreg::enums::HKEY_CLASSES_ROOT)
+        .open_subkey(r"BYOND.byond_file\shell\open\Command")
+        .ok()
+        .and_then(|key| key.get_value::<String, _>("").ok())
+        .and_then(|command| {
+          let raw = command.trim();
+          let exe_path = raw
+            .strip_prefix('"')
+            .and_then(|s| s.split('"').next())
+            .unwrap_or(raw)
+            .trim();
+
+          if !exe_path.to_ascii_lowercase().ends_with("byond.exe") {
+            return None;
+          }
+
+          let root = Path::new(exe_path).parent()?.parent()?;
+          Some(root.to_string_lossy().to_string())
+        })
+    };
+
+    read_install_path().or_else(read_install_path_from_command)
   };
 
-  let read_install_path_from_command = || {
-    winreg::RegKey::predef(winreg::enums::HKEY_CLASSES_ROOT)
-      .open_subkey(r"BYOND.byond_file\shell\open\Command")
-      .ok()
-      .and_then(|key| key.get_value::<String, _>("").ok())
-      .and_then(|command| {
-        let raw = command.trim();
-        let exe_path = raw
-          .strip_prefix('"')
-          .and_then(|s| s.split('"').next())
-          .unwrap_or(raw)
-          .trim();
+  #[cfg(not(windows))]
+  let detected_path: Option<String> = None;
 
-        if !exe_path.to_ascii_lowercase().ends_with("byond.exe") {
-          return None;
-        }
-
-        let root = Path::new(exe_path).parent()?.parent()?;
-        Some(root.to_string_lossy().to_string())
-      })
-  };
-
-  let detected_path = read_install_path().or_else(read_install_path_from_command);
-
+  #[cfg(windows)]
   let byond_path = detected_path.unwrap_or_else(|| r"C:\Program Files (x86)\BYOND".to_string());
-  let ds_path = Path::new(&byond_path).join("bin").join("dreamseeker.exe");
-  let path_exists = ds_path.exists();
+
+  #[cfg(not(windows))]
+  let byond_path = match detected_path {
+    Some(path) => path,
+    None => String::new(),
+  };
+
+  let path_exists = !byond_path.is_empty()
+    && Path::new(&byond_path)
+      .join("bin")
+      .join("dreamseeker.exe")
+      .exists();
 
   if path_exists {
     Ok(InstallResult {
