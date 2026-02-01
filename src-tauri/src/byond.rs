@@ -131,7 +131,7 @@ pub async fn download_byond_installer(
       println!("Failed to download from primary URL: {primary_error}");
 
       let backup_url =
-        format!("https://spacestation13.github.io/byond-builds/{major}/{major}.{minor}_byond.exe");
+        format!("https://byond-builds.dm-lang.org/{major}/{major}.{minor}_byond.exe");
 
       match download_file(&backup_url, &installer_path, &client).await {
         Ok(_) => Ok(DownloadResult {
@@ -194,21 +194,49 @@ pub fn install_byond(installer_path: &str) -> Result<InstallResult, String> {
     .output()
     .map_err(|e| format!("Failed to execute installer: {e}"))?;
 
-  // Verify installation by checking default path and registry
-  let byond_path = r"C:\Program Files (x86)\BYOND";
-  let ds_path = Path::new(byond_path).join("bin").join("dreamseeker.exe");
+  // check HKLM
+  let read_install_path = || {
+    winreg::RegKey::predef(winreg::enums::HKEY_LOCAL_MACHINE)
+      .open_subkey(r"SOFTWARE\WOW6432Node\Dantom\BYOND")
+      .ok()
+      .and_then(|key| key.get_value::<String, _>("installpath").ok())
+      .filter(|path| !path.is_empty())
+  };
+
+  let read_install_path_from_command = || {
+    winreg::RegKey::predef(winreg::enums::HKEY_CLASSES_ROOT)
+      .open_subkey(r"BYOND.byond_file\shell\open\Command")
+      .ok()
+      .and_then(|key| key.get_value::<String, _>("").ok())
+      .and_then(|command| {
+        let raw = command.trim();
+        let exe_path = raw
+          .strip_prefix('"')
+          .and_then(|s| s.split('"').next())
+          .unwrap_or(raw)
+          .trim();
+
+        if !exe_path.to_ascii_lowercase().ends_with("byond.exe") {
+          return None;
+        }
+
+        let root = Path::new(exe_path).parent()?.parent()?;
+        Some(root.to_string_lossy().to_string())
+      })
+  };
+
+  let detected_path = read_install_path().or_else(read_install_path_from_command);
+
+  let byond_path = detected_path.unwrap_or_else(|| r"C:\Program Files (x86)\BYOND".to_string());
+  let ds_path = Path::new(&byond_path).join("bin").join("dreamseeker.exe");
   let path_exists = ds_path.exists();
 
-  let regkey =
-    winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER).open_subkey(r"Software\Dantom\BYOND");
-
-  if path_exists || regkey.is_ok() {
+  if path_exists {
     Ok(InstallResult {
       success: true,
       message: format!("BYOND installed successfully at {byond_path}"),
     })
   } else {
-    // Neither path nor registry key found - installation likely failed (or weird custom dir)
     Err("BYOND installation could not be verified. The installation may have been cancelled or failed.".to_string())
   }
 }
