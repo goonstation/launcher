@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - platform: "windows-latest"
-            args: "--bundles nsis"
+            args: "--bundles nsis --config tauri.release.conf.json" #merges
 
     runs-on: ${{ matrix.platform }}
     steps:
