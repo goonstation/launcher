@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - platform: "windows-latest"
-            args: "--bundles nsis --config src-tauri/tauri.release.conf.json" #merges
+            args: "--bundles nsis --config '{\"build\":{\"removeUnusedCommands\":true}}'" #merges
 
     runs-on: ${{ matrix.platform }}
     steps:
