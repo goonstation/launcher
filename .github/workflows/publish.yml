@@ -15,7 +15,6 @@ jobs:
       matrix:
         include:
           - platform: "windows-latest"
-            args: "--bundles nsis --config '{\"build\":{\"removeUnusedCommands\":true}}'" #merges
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -52,5 +51,5 @@ jobs:
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.args }}
+          args: "--bundles nsis --config '{\"build\":{\"removeUnusedCommands\":true}}'"
           updaterJsonPreferNsis: true
