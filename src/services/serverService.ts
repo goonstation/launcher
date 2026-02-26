@@ -241,13 +241,10 @@ export async function fetchServerStatus(): Promise<ServerInfo[]> {
 async function fetchFreshData(): Promise<ServerInfo[]> {
   try {
     // Use Tauri's HTTP plugin to fetch data
-    const response = await fetch("https://api.goonhub.com/servers", {
-      method: "GET",
-      headers: {
-        "User-Agent": `GoonstationLauncher/${packageInfo.version}`,
-      },
-      connectTimeout: 5_000, // 5 seconds
+    const request = new Request("https://api.goonhub.com/servers", {
+      headers: { "User-Agent": `GoonstationLauncher/${packageInfo.version}` },
     });
+    const response = await fetch(request, { connectTimeout: 5_000 });
 
     // Check if response is successful
     if (!response.ok) {

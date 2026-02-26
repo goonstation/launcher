@@ -12,6 +12,7 @@
       "allow": [
         { "url": "https://api.goonhub.com" },
         { "url": "https://raw.githubusercontent.com" },
+        { "url": "https://byond-builds.dm-lang.org" },
         { "url": "https://www.byond.com" }
       ]
     },

@@ -1,7 +1,7 @@
 # Goonstation Launcher
 
-A Windows application for checking the Goonstation Space Station 13 server
-statuses and launching the game.
+An application for checking the Goonstation Space Station 13 server statuses and
+launching the game.
 
 ![alt text](.github/readme.png)
 
