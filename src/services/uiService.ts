@@ -12,7 +12,6 @@ import {
   ShuttleDirection,
   ShuttleLocation,
 } from "./serverService.ts";
-// Server fields are normalized by `serverService` on receipt
 
 // DOM Elements
 let serverButtonsContainer: HTMLElement;
