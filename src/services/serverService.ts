@@ -6,6 +6,14 @@ import {
   writeTextFile,
 } from "@tauri-apps/plugin-fs";
 import { fetch } from "@tauri-apps/plugin-http";
+import {
+  deserializeGameState,
+  deserializeRoundDuration,
+  deserializeShuttleDirection,
+  deserializeShuttleLocation,
+  deserializeShuttleOnline,
+  deserializeShuttleTimer,
+} from "./serverDataUtils.ts";
 import packageInfo from "../../package.json" with { type: "json" };
 import { getSettings } from "./settingsService.ts";
 
@@ -42,17 +50,35 @@ export interface ServerInfo {
   port: number;
   active: boolean;
   invisible: boolean;
+  group_id: ServerGroup;
   created_at: string;
   updated_at: string;
   player_count: number;
   current_round_id: number;
   current_map: string;
-  group_id: ServerGroup;
+  gamestate?: ServerGameState;
+  round_duration?: number;
+  shuttle_direction?: ShuttleDirection;
+  shuttle_location?: ShuttleLocation;
+  shuttle_online?: boolean | number;
+  shuttle_timer?: number;
 }
 
 export enum ServerGroup {
   DEFAULT = 1,
   TOMATO = 2,
+}
+
+export enum ShuttleDirection {
+  TO_STATION = 1,
+  TO_CENTCOMM = -1,
+}
+
+export enum ShuttleLocation {
+  CENTCOM = 0,
+  STATION = 1,
+  TRANSIT = 1.5,
+  RETURNED = 2,
 }
 
 export enum ServerDataState {
@@ -61,6 +87,18 @@ export enum ServerDataState {
   LOADED_CACHE = "loaded_cache",
   REFRESHING = "refreshing",
   ERROR = "error",
+}
+
+export enum ServerGameState {
+  INVALID = 0,
+  PRE_MAP_LOAD = 1,
+  MAP_LOAD = 2,
+  WORLD_INIT = 3,
+  WORLD_NEW = 4,
+  PREGAME = 5,
+  SETTING_UP = 6,
+  PLAYING = 7,
+  FINISHED = 8,
 }
 
 let currentState = ServerDataState.LOADING;
@@ -254,9 +292,28 @@ async function fetchFreshData(): Promise<ServerInfo[]> {
     const apiResponse: ApiResponse = await response.json();
     const servers = apiResponse.data;
 
-    // Process server data
+    // Process server data: normalize deserialized fields and provide safe defaults
     const processedServers = servers.map((server) => {
-      return server;
+      const raw = server as unknown as Record<string, unknown>;
+
+      const gamestate = deserializeGameState(raw.gamestate);
+      const round_duration = deserializeRoundDuration(raw.round_duration);
+      const shuttle_timer = deserializeShuttleTimer(raw.shuttle_timer);
+      const shuttle_online = deserializeShuttleOnline(raw.shuttle_online);
+      const shuttle_direction = deserializeShuttleDirection(
+        raw.shuttle_direction,
+      );
+      const shuttle_location = deserializeShuttleLocation(raw.shuttle_location);
+
+      return {
+        ...server,
+        gamestate,
+        round_duration,
+        shuttle_timer,
+        shuttle_online,
+        shuttle_direction,
+        shuttle_location,
+      } as ServerInfo;
     });
 
     // Cache the successful response

@@ -1,13 +1,18 @@
 // UI service for managing interface elements
 
+import { isPreRoundState } from "./serverDataUtils.ts";
 import { joinServer } from "./serverJoinService.ts";
 import {
   getSortedServers,
   isServerOnline,
   ServerDataState,
+  ServerGameState,
   ServerGroup,
   ServerInfo,
+  ShuttleDirection,
+  ShuttleLocation,
 } from "./serverService.ts";
+// Server fields are normalized by `serverService` on receipt
 
 // DOM Elements
 let serverButtonsContainer: HTMLElement;
@@ -68,6 +73,14 @@ export function updateStatusNotice(
   }
 }
 
+/** Format seconds as MM:SS (pads minutes and seconds) */
+function fmtMMSS(secs: number | null): string {
+  if (secs === null || typeof secs !== "number") return "00:00";
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
 /** Create buttons for each server */
 export async function createServerButtons(servers: ServerInfo[]) {
   serverButtonsContainer.innerHTML = "";
@@ -76,7 +89,6 @@ export async function createServerButtons(servers: ServerInfo[]) {
     const button = document.createElement("button");
     button.className = "server-button styled";
 
-    // Add tomato emoji for servers with group_id 2
     if (server.group_id === ServerGroup.TOMATO) {
       const tomatoEmoji = document.createElement("div");
       tomatoEmoji.textContent = "🍅";
@@ -84,6 +96,7 @@ export async function createServerButtons(servers: ServerInfo[]) {
       button.appendChild(tomatoEmoji);
     }
 
+    // -- Name --
     const line1 = document.createElement("span");
     line1.style.display = "block";
     const nameMatch = server.name.match(/^(.+?):\s*(.+)$/);
@@ -103,15 +116,69 @@ export async function createServerButtons(servers: ServerInfo[]) {
     } else {
       line1.textContent = cleanShortName;
     }
+
+    // -- Map and Round Time --
     const line2 = document.createElement("span");
     line2.style.display = "block";
-    line2.textContent = `${server.current_map}`;
+
+    const mapSpan = document.createElement("span");
+    mapSpan.textContent = `${server.current_map}`;
+    mapSpan.className = "map-name";
+
+    const roundInline = document.createElement("span");
+    roundInline.className = "round-time-inline";
+    roundInline.style.marginLeft = "8px";
+
+    const state = server.gamestate;
+    const alwaysRoundSecs = server.round_duration ?? 0;
+
+    if (isPreRoundState(state)) {
+      roundInline.textContent = "| STARTING";
+    } else if (state === ServerGameState.FINISHED) {
+      roundInline.textContent = "| ENDED";
+    } else {
+      roundInline.textContent = `| ⏱ ${fmtMMSS(alwaysRoundSecs)}`;
+    }
+
+    line2.appendChild(mapSpan);
+    line2.appendChild(roundInline);
+
+    // -- Player Count --
     const line3 = document.createElement("span");
     line3.style.display = "block";
     line3.textContent = `${server.player_count} players`;
+
     button.appendChild(line1);
     button.appendChild(line2);
     button.appendChild(line3);
+
+    // -- Shuttle status indicator --
+    if (
+      server.shuttle_online &&
+      typeof server.shuttle_location !== "undefined" &&
+      server.shuttle_location !== null &&
+      (server.shuttle_location as number) < ShuttleLocation.RETURNED
+    ) {
+      const timeleft = server.shuttle_timer ?? null;
+      if (timeleft && typeof timeleft === "number") {
+        const line4 = document.createElement("span");
+        line4.style.display = "block";
+        line4.className = "shuttle-indicator";
+
+        const loc = server.shuttle_location as number;
+        let locstr = "";
+        if (loc === ShuttleLocation.STATION) locstr = "ETD";
+        else if (loc === ShuttleLocation.TRANSIT) locstr = "ESC";
+        else if (server.shuttle_direction === ShuttleDirection.TO_CENTCOMM) {
+          locstr = "RCL";
+        } else locstr = "ETA";
+
+        line4.textContent = `Shuttle ${locstr} — ${fmtMMSS(timeleft)}`;
+        button.appendChild(line4);
+      }
+    }
+
+    // round time is displayed inline next to the map name above
     const serverOnline = isServerOnline(server);
     button.classList.add(serverOnline ? "server-online" : "server-offline");
     if (server.invisible) {
